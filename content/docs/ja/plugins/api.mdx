@@ -1,0 +1,137 @@
+---
+title: "API リファレンス"
+description: "プラグインのメソッド、権限、結果タイプ、およびイベント。"
+---
+
+ページは`nugget.call(method, params)`を使ってメソッドを呼び出し、`nugget.on(event, handler)`を使ってイベントを待ち受けます。詳細は[ページ作成](/ja/docs/plugins/pages)を参照してください。
+
+プラグインに必要な権限がない場合、メソッドは不足している権限を示すエラーで失敗します。無効なプラグインからのメソッド呼び出しも失敗します。
+
+## メソッド [#methods]
+
+### アプリ [#app]
+
+| メソッド | 権限 | パラメータ | 返り値 |
+| --- | --- | --- | --- |
+| `app.info` | — | | `{ version, language, platform, plugin: { id, version, permissions } }` |
+| `app.theme` | — | | SDK が適用するテーマ。[下記](#apptheme)を参照してください。 |
+| `ui.toast` | — | `{ text, kind? }` | `null`. プラグイン名が前に付いた短いメッセージを表示します。`kind`は`"info"`（デフォルト）、`"success"`または`"error"`です。最大で1.5秒ごとに1回のみ。 |
+| `storage.get` | — | `{ key }` | 保存されたJSON値、または`null`. |
+| `storage.set` | — | `{ key, value }` | `null`. `value`は任意のJSON値です; `null`はキーを削除します。キーは最大200文字まで、全体で最大1MBまでです。 |
+| `notify` | `notifications` | `{ title, body }` | `null`。システム通知、「プラグイン名: タイトル」。最大で10秒に1回まで。ユーザーは通知をオフにしている場合があります。 |
+
+### 接続 [#connection]
+
+| メソッド | 権限 | パラメータ | 返り値 |
+| --- | --- | --- | --- |
+| `vpn.status` | `state` | | [状態オブジェクト](#state)。 |
+| `vpn.traffic` | `state` | | [通信量データ](#traffic)。 |
+| `vpn.connect` | `control` | `{ server? }` | [状態オブジェクト](#state)。`servers.list` のサーバー ID またはアプリで選択中のサーバーに接続します。接続後に Promise が解決され、利用できるサーバーがない場合は拒否されます。 |
+| `vpn.disconnect` | `control` | | `null` |
+| `connections.list` | `connections` | | 開いている接続; 下記[参照](#connection)。 |
+
+### サーバーとルーティング [#servers-and-routing]
+
+| メソッド | 権限 | パラメータ | 返り値 |
+| --- | --- | --- | --- |
+| `servers.list` | `profiles` | | `[{ id, name, protocol, host, favorite, subscription }]`。`subscription`はサブスクリプションのドメイン、または`null`です。リンク自体ではなく、リンクは認証情報を保持しています。 |
+| `servers.add` | `import` | `{ link, name? }` | `null`。共有リンク（`vless://`、`ss://`、…）からサーバーを追加します。 |
+| `subscriptions.add` | `import` | `{ url }` | `null`。サブスクリプションを追加して取得します。 |
+| `routing.addRule` | `routing` | `{ kind, values, action, invert? }` | `null`。ユーザーのルーティングの最後にルールを追加し、あなたのプラグインが追加したというメモを付け、適用します。 |
+
+`routing.addRule`:
+
+| パラメータ | |
+| --- | --- |
+| `kind` | `apps`（プログラム名）、`domains`、`ip`（アドレスおよびCIDR範囲）、`domain_regex`、`port`（`8000-8080`のような番号および範囲）、`protocol`（`bittorrent`、`quic`、…）、`geosite`、`geoip`（`ru`のような国コード）、`network`（`tcp`、`udp`）、`ruleset`（ルールリストのURL）。 |
+| `values` | 一致させる値、最大5000。 |
+| `action` | `proxy`（VPN、`direct`、または`block` を通じて）。 |
+| `invert` | 値に一致しないものすべてを一致させる。 |
+
+## イベント [#events]
+
+| イベント | 権限 | データ |
+| --- | --- | --- |
+| `vpn.state` | `state` | [状態オブジェクト](#state)。購読時に一度送信され、その後は変更のたびに送信されます。 |
+| `vpn.traffic` | `state` | 接続中は毎秒 [通信量データ](#traffic) を送信します。 |
+| `app.theme` | — | ユーザーが変更するたびに [テーマ](#apptheme) を送信します。SDK が自動的に適用します。 |
+
+## 種類 [#types]
+
+### 状態 [#state]
+
+```json
+{
+  "status": "connected",
+  "server": "Frankfurt 1",
+  "server_id": "p-de",
+  "since": 1790000000000,
+  "reconnecting": false,
+  "blocked": false,
+  "error": null
+}
+```
+
+| フィールド | |
+| --- | --- |
+| `status` | `idle`、`connecting`、`connected`または`error`。 |
+| `server`、`server_id` | サーバー、接続中または接続済み。 |
+| `since` | トンネルが立ち上がった時、Unixミリ秒で。 |
+| `reconnecting` | トンネルがドロップして再接続中。 |
+| `blocked` | キルスイッチが全てのトラフィックを保持している。 |
+| `error` | `status`が`error`のとき、何が問題だったか。 |
+
+### トラフィック [#traffic]
+
+```json
+{ "up": 12000000, "down": 340000000, "up_rate": 42000, "down_rate": 1830000, "total_up": 0, "total_down": 0 }
+```
+
+`up`と`down`はこのセッションのバイト数; レートは1秒あたりのバイト数です。
+
+### 接続 [#connection-1]
+
+```json
+{
+  "id": "…",
+  "network": "tcp",
+  "protocol": "tls",
+  "host": "www.example.com",
+  "destination": "93.184.216.34:443",
+  "app": "chrome.exe",
+  "rule": "rule-1",
+  "route": "proxy",
+  "server": "p-de",
+  "upload": 1200,
+  "download": 48000,
+  "started": 1790000000000
+}
+```
+
+`rule` は一致したルーティングルールのIDで、その他の場合は `"__default"`、アプリ自身がルートする接続の場合は `""` です。
+
+### app.theme [#apptheme]
+
+```json
+{
+  "mode": "dark",
+  "colors": { "background": "oklch(…)", "foreground": "…", "primary": "…" },
+  "radius": "0.625rem",
+  "font": "…",
+  "language": "en",
+  "dir": "ltr"
+}
+```
+
+## 低レベルプロトコル [#low-level-protocol]
+
+SDK は `postMessage` をラップします。独自の SDK を書く場合を除き、これを使用する必要はありません。
+
+- **ページからアプリへ:**
+  - `{ nugget: 1, id, method, params }`: 呼び出し;
+  - `{ nugget: 1, subscribe: "event" }`: イベントを待つ;
+  - `{ nugget: 1, hello: true }`: ページが読み込まれた;
+  - `{ nugget: 1, height }`: パネルの高さ.
+- **アプリからページへ:**
+  - `{ nugget: 1, id, result }` または `{ nugget: 1, id, error }`: 応答;
+  - `{ nugget: 1, event, data }`: イベント.

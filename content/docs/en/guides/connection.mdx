@@ -1,0 +1,38 @@
+---
+title: "Connection behaviour"
+description: "Understand reconnect, the kill switch, startup, and window closing."
+---
+
+Most connection controls are under **Settings → Behaviour**.
+
+## Reconnect automatically
+
+**Reconnect automatically** brings the tunnel back if it stops without a deliberate disconnect. In automatic mode, the app can choose the best server that answers.
+
+Use this alongside the [server selection settings](/en/docs/guides/servers) if you want failed connections to try other servers.
+
+## Kill switch
+
+**Kill switch** blocks internet traffic when the tunnel goes down unexpectedly. Local network access remains available, and NuggetVPN itself can still reach servers and refresh subscriptions so it can reconnect. The app shows when the kill switch is holding traffic.
+
+Press **Disconnect** to release the block intentionally. The kill switch should not be understood as a permanent firewall after you disconnect or quit the application.
+
+If the app reports that the kill switch stopped, traffic is no longer being blocked. Reconnect or inspect [logs](/en/docs/guides/monitoring#logs) to diagnose the failure.
+
+## Startup
+
+On desktop, **Launch at login** starts NuggetVPN in the background when you sign in. **Connect automatically** connects to the last-used server when the app starts.
+
+These are separate choices: launching the app does not imply connecting unless automatic connection is enabled.
+
+## Closing the window
+
+| Choice | Result |
+| --- | --- |
+| **Keep running in the tray** | Hides the window and keeps the VPN running. Use the tray icon to reopen it. |
+| **Hide completely** | Hides the window, taskbar entry, and tray icon. Launch NuggetVPN again to show the existing instance. |
+| **Quit** | Stops the app and disconnects the VPN. |
+
+## Notifications
+
+Enable notifications for a system message when a connection drops and comes back. The desktop [global shortcut and Wi-Fi rules](/en/docs/guides/automation) provide additional ways to control connections.

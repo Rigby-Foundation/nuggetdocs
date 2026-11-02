@@ -1,0 +1,32 @@
+---
+title: "プロトコルと設定形式"
+description: "サポートされているサーバーファミリー、トランスポート、およびインポート形式。"
+---
+
+プロトコルのサポートは[選択されたコア](/ja/docs/reference/cores)に依存します。互換性の基準として組み込みのコアを使用してください。
+
+## サーバープロトコル [#server-protocols]
+
+クライアントはVLESS、VMess、Trojan、Shadowsocks、Hysteria、Hysteria2、TUIC、WireGuard、SOCKS、HTTP、およびSSHをサポートしています。
+
+VLESSはRealityをXTLS Visionでサポートします。組み込みのTodayCore実装には、`X25519MLKEM768`キーシェアとVLESSポスト量子暗号化とともにRealityも含まれています。
+
+## トランスポート [#transports]
+
+サポートされているトランスポートファミリーには、TCP、WebSocket、gRPC、HTTP/2、HTTPUpgrade、およびXHTTPが含まれます。トランスポートは、選択されたコアとサーバー構成の両方でサポートされている必要があります。
+
+- **XHTTP:** は、組み込みのコアまたはXrayを使用します。
+- **Hysteria、Hysteria2、TUIC、SSH:** は、Xray以外のコアを使用します。
+- **Shadowsocksプラグイン:** はXrayを通じて使用できません。
+
+## インポート形式 [#import-formats]
+
+パーサーは、一般的なプロトコル共有リンク、サブスクリプション、完全なsing-box JSON、およびClash構成を受け入れます。完全なClash構成の場合、mihomoは意図されたClash実行時の挙動を保持します。
+
+追加ダイアログはQR画像をデコードできます。`nuggetvpn://` クリップボードにコピーされたディープリンクやサポートされている接続リンクもインポート用として提供できます。
+
+インポートのワークフローについては[プロフィールとサブスクリプション](/ja/docs/guides/profiles)を参照してください。
+
+## サポートされていないrigbyプロフィール [#unsupported-rigby-profiles]
+
+`rigby://` プロフィールはリストに表示されることがありますが、接続されません。そのプロトコルはclash-rsのフォークに存在し、組み込みコアでは実装されていません。プロバイダーからサポートされている接続形式を取得してください。

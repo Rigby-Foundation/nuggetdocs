@@ -1,0 +1,98 @@
+---
+title: "プラグインページの作成"
+description: "JavaScriptのSDK、テーマ変数、イベント、ストレージを使用します。"
+---
+
+プラグインには、両方ともプレーンHTMLの2つのページを持たせることができます。
+
+- 設定 → プラグインでプラグインの下に表示される、 **パネル**
+- プラグインがオンの間、見えないまま実行され続ける **バックグラウンドページ** ページ。接続が切れたときの通知のようなイベントに反応するために使用します。
+
+## SDK [#the-sdk]
+
+SDKを含め、グローバル`nugget`を使用します：
+
+```html
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="/plugins/_sdk/nugget.js"></script>
+</head>
+<body>
+  <p id="status">…</p>
+  <script>
+    const show = (state) => {
+      document.getElementById("status").textContent = state.status;
+    };
+    nugget.call("vpn.status").then(show);
+    nugget.on("vpn.state", show);
+  </script>
+</body>
+</html>
+```
+
+| | |
+| --- | --- |
+| `nugget.call(method, params?)` | アプリのメソッドを呼び出します。結果のプロミスを返すか、何が問題だったかを示すメッセージをもつ`Error`で拒否されます。 |
+| `nugget.on(event, handler)` | イベントのリスニングを行います。リスニングを停止する関数を返します。 |
+| `nugget.fit()` | アプリにパネルをコンテンツのサイズに合わせるよう指示します。ページのサイズが変更されるとSDKはすでにこれを行います。 |
+
+すべてのメソッドとイベントは[APIリファレンス](/ja/docs/plugins/api)にあります。
+
+## アプリのように見える [#looking-like-the-app]
+
+SDK はページにユーザーのテーマを反映し、最新の状態に保ちます：
+
+- **色:** `<html>` に CSS 変数として設定されます：
+  - `--background`、`--foreground`、`--card`、`--card-foreground`;
+  - `--primary`、`--primary-foreground`、`--secondary`、`--muted`、
+ `--muted-foreground`、`--accent`;
+  - `--border`、`--input`、`--ring`、`--destructive`;
+  - `--status-connected`、`--status-connecting`、`--status-error`、
+ `--status-idle`。
+- **形状:** `--radius`、アプリの角の半径。
+- **属性:** `color-scheme`、`data-theme="light|dark"`、`lang`および
+ `dir`（ペルシャ語は右から左）。
+
+ページの背景を透明にして、アプリの一部のように表示します：
+
+```css
+html { background: transparent; color: var(--foreground); font: 13px/1.4 system-ui, sans-serif; }
+button { background: var(--primary); color: var(--primary-foreground); border: 0; border-radius: var(--radius); }
+.muted { color: var(--muted-foreground); }
+```
+
+アプリ固有のフォントはページ内では利用できません。システムフォントスタックを使うか、プラグイン内にフォントを持ち込んでください。
+
+## サイズ [#size]
+
+パネルはプラグインのカードと同じ幅で、内容に応じてサイズを調整します。高さは60ピクセルから4000ピクセルまでです。`height: 100vh` レイアウトは避けてください：フレームはその中の内容の高さを取ります。
+
+## データの保存 [#storing-things]
+
+各プラグインは、最大1MBのJSONストレージを持ち、再起動やアップデート後も保持され、プラグインが削除されると同時に削除されます。
+
+```js
+const count = (await nugget.call("storage.get", { key: "count" })) ?? 0;
+await nugget.call("storage.set", { key: "count", value: count + 1 });
+```
+
+`localStorage` とクッキーはサンドボックス内では動作しません。
+
+## 動作しないもの [#what-doesnt-work]
+
+ページはサンドボックス内で実行されます。詳細は [権限とサンドボックス](/ja/docs/plugins/security) を参照してください。要するに:
+
+- フォームは使用できません（JavaScriptと `nugget.call` を使用してください）；
+- ポップアップ、`alert`、新しいウィンドウは不可；
+- ネストされたフレームは不可；
+- `eval` や `new Function` は不可；
+- `network` に指定されたホスト以外へのネットワークアクセスは不可。
+- 自分のプラグイン以外のスクリプト、スタイル、画像は使用しないでください。
+
+プラグイン自身のファイルへのリンクは、絶対パス、`/plugins/<your id>/file.png`、または相対パスで動作します。
+
+## デバッグ [#debugging]
+
+開発ビルド（`make dev`）では、Shiftキーを押しながらページを右クリックして「検証」を選択すると開発者ツールが開き、コンソールのコンテキストセレクターでプラグインのフレームを選択できます。`console.log` の出力がそこに表示されます。

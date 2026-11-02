@@ -1,0 +1,41 @@
+---
+title: "Traffic, statistics, and logs"
+description: "See what the tunnel carries and collect useful diagnostics."
+---
+
+## Live traffic
+
+The **Home** screen displays traffic counters read from the running core. These are separate from subscription allowance and expiry values supplied by your provider.
+
+## Open connections
+
+**Activity → Network connections** shows live connections with the program behind them, the rule that matched, and the server used. You can close an individual connection from this screen.
+
+This is the best place to verify a routing change: create a new request from the app or site, then inspect its matched rule and route. Routing hit counts show connections open now, rather than a lifetime total.
+
+## Statistics
+
+**Activity → Statistics** keeps traffic by application and day, along with each server’s uptime and latency over the last day and week. These statistics are stored on your computer.
+
+## Speed test
+
+Run a speed test from **Home** while connected. It measures through the current server. Desktop users can also run:
+
+```bash
+NuggetVPN speedtest
+```
+
+The command reports download, upload, ping, and jitter. Tests consume data, so account for your provider’s limits.
+
+## Logs
+
+Logging is off by default in release builds. Use **Turn logging on** under **Activity → Logs** or enable it under **Settings → Privacy** when diagnosing a problem.
+
+1. Turn logging on.
+2. Reproduce the failed connection or request.
+3. Open **Activity → Logs** and review the error. Export the relevant diagnostics if needed.
+4. Turn logging off when finished. Doing so also deletes the saved log.
+
+Logs remain in English even when the interface uses another language. Review exported diagnostics for server addresses, domains, and other private information before attaching them to an issue.
+
+For saved log locations, see [files and folders](/en/docs/reference/files).

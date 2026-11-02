@@ -1,0 +1,137 @@
+---
+title: "مرجع API"
+description: "روش‌های پلاگین، مجوزها، نوع نتایج و رویدادها."
+---
+
+صفحات با `nugget.call(method, params)` متدها را فراخوانی می‌کنند و با `nugget.on(event, handler)` به رویدادها گوش می‌دهند؛ ببینید [نگارش صفحات](/fa/docs/plugins/pages).
+
+اگر افزونه مجوز لازم را نداشته باشد، فراخوانی روش با خطایی که مجوز موردنیاز را مشخص می‌کند شکست می‌خورد. فراخوانی روش‌های افزونهٔ غیرفعال نیز رد می‌شود.
+
+## متدها [#methods]
+
+### برنامه [#app]
+
+| متد | مجوز | پارامترها | بازگشت‌ها |
+| --- | --- | --- | --- |
+| `app.info` | — | | `{ version, language, platform, plugin: { id, version, permissions } }` |
+| `app.theme` | — | | پوسته‌ای که SDK اعمال می‌کند؛ [پایین](#apptheme) را ببینید. |
+| `ui.toast` | — | `{ text, kind? }` | `null`. یک پیام کوتاه نمایش می‌دهد که با نام افزونه پیشوند شده است. `kind` برابر با `"info"` (پیش‌فرض)، `"success"` یا `"error"` است. حداکثر یکی هر 1.5 ثانیه. |
+| `storage.get` | — | `{ key }` | مقدار ذخیره‌شده JSON، یا `null`. |
+| `storage.set` | — | `{ key, value }` | `null`. `value` می‌تواند هر مقدار JSON باشد؛ `null` کلید را حذف می‌کند. کلیدها تا 200 کاراکتر و مجموع همه تا 1 مگابایت است. |
+| `notify` | `notifications` | `{ title, body }` | `null`. یک اعلان سیستمی با عنوان «نام افزونه: عنوان». حداکثر یک بار هر 10 ثانیه. ممکن است کاربر اعلان‌ها را خاموش کرده باشد. |
+
+### اتصال [#connection]
+
+| متد | مجوز | پارامترها | بازگشت‌ها |
+| --- | --- | --- | --- |
+| `vpn.status` | `state` | | یک [شیء وضعیت](#state). |
+| `vpn.traffic` | `state` | | یک [نمونهٔ دادهٔ ترافیک](#traffic). |
+| `vpn.connect` | `control` | `{ server? }` | یک [شیء وضعیت](#state). به شناسهٔ سرور در `servers.list` یا سرور انتخاب‌شده در برنامه متصل می‌شود. پس از اتصال، Promise تکمیل می‌شود و اگر هیچ سروری کار نکند رد می‌شود. |
+| `vpn.disconnect` | `control` | | `null` |
+| `connections.list` | `connections` | | اتصالات باز؛ ببینید [در زیر](#connection). |
+
+### سرورها و مسیر‌یابی [#servers-and-routing]
+
+| متد | مجوز | پارامترها | بازگشت‌ها |
+| --- | --- | --- | --- |
+| `servers.list` | `profiles` | | `[{ id, name, protocol, host, favorite, subscription }]`. `subscription` دامنه اشتراک است، یا `null`. هرگز لینک‌ها نیستند که اطلاعات ورود را نگه می‌دارند. |
+| `servers.add` | `import` | `{ link, name? }` | `null`. افزودن یک سرور از لینک اشتراک‌گذاری (`vless://`، `ss://`، …). |
+| `subscriptions.add` | `import` | `{ url }` | `null`. افزودن و دریافت یک اشتراک. |
+| `routing.addRule` | `routing` | `{ kind, values, action, invert? }` | `null`. افزودن یک قانون در انتهای مسیر یابی کاربر، با یادداشتی که پلاگین شما آن را اضافه کرده است و اعمال آن. |
+
+`routing.addRule`:
+
+| پارامتر | |
+| --- | --- |
+| `kind` | `apps` (نام برنامه‌ها)، `domains`، `ip` (آدرس‌ها و بازه‌های CIDR)، `domain_regex`، `port` (اعداد و بازه‌هایی مثل `8000-8080`)، `protocol` (`bittorrent`، `quic`، …)، `geosite`، `geoip` (کدهای کشور مثل `ru`)، `network` (`tcp`، `udp`)، `ruleset` (آدرس‌های لیست قوانین). |
+| `values` | مقادیر برای مطابقت، تا حداکثر ۵۰۰۰. |
+| `action` | `proxy` (از طریق VPN)، `direct` یا `block`. |
+| `invert` | همه چیز را که مقادیر نمی‌سازند، مطابقت بده. |
+
+## رویدادها [#events]
+
+| رویداد | مجوز | داده |
+| --- | --- | --- |
+| `vpn.state` | `state` | یک [شیء وضعیت](#state)؛ یک بار هنگام اشتراک و سپس با هر تغییر فرستاده می‌شود. |
+| `vpn.traffic` | `state` | یک [نمونهٔ دادهٔ ترافیک](#traffic)، هر ثانیه هنگام اتصال. |
+| `app.theme` | — | [پوسته](#apptheme) هر بار که کاربر آن را تغییر می‌دهد. SDK آن را خودکار اعمال می‌کند. |
+
+## نوع‌ها [#types]
+
+### وضعیت [#state]
+
+```json
+{
+  "status": "connected",
+  "server": "Frankfurt 1",
+  "server_id": "p-de",
+  "since": 1790000000000,
+  "reconnecting": false,
+  "blocked": false,
+  "error": null
+}
+```
+
+| فیلد | |
+| --- | --- |
+| `status` | `idle`، `connecting`، `connected` یا `error`. |
+| `server`، `server_id` | سرور، در حین اتصال یا متصل بودن. |
+| `since` | وقتی تونل راه‌اندازی شد، برحسب میلی‌ثانیه یونیکس. |
+| `reconnecting` | تونل افتاده و در حال بازگردانی است. |
+| `blocked` | سوئیچ قطع‌کننده همه ترافیک را نگه می‌دارد. |
+| `error` | چه چیزی اشتباه پیش رفت، وقتی `status` برابر با `error` است. |
+
+### ترافیک [#traffic]
+
+```json
+{ "up": 12000000, "down": 340000000, "up_rate": 42000, "down_rate": 1830000, "total_up": 0, "total_down": 0 }
+```
+
+`up` و `down` بایت‌های این جلسه هستند؛ سرعت‌ها بر حسب بایت در ثانیه است.
+
+### اتصال [#connection-1]
+
+```json
+{
+  "id": "…",
+  "network": "tcp",
+  "protocol": "tls",
+  "host": "www.example.com",
+  "destination": "93.184.216.34:443",
+  "app": "chrome.exe",
+  "rule": "rule-1",
+  "route": "proxy",
+  "server": "p-de",
+  "upload": 1200,
+  "download": 48000,
+  "started": 1790000000000
+}
+```
+
+`rule` شناسه قانونی مسیریابی است که مطابقت دارد، `"__default"` برای همه چیز دیگر، یا `""` برای اتصالاتی که برنامه خودش مسیریابی می‌کند.
+
+### app.theme [#apptheme]
+
+```json
+{
+  "mode": "dark",
+  "colors": { "background": "oklch(…)", "foreground": "…", "primary": "…" },
+  "radius": "0.625rem",
+  "font": "…",
+  "language": "en",
+  "dir": "ltr"
+}
+```
+
+## پروتکل سطح پایین [#low-level-protocol]
+
+SDK `postMessage` را پوشش می‌دهد. شما به این نیاز ندارید مگر اینکه در حال نوشتن SDK خود باشید:
+
+- **صفحه به برنامه:**
+  - `{ nugget: 1, id, method, params }`: یک فراخوانی؛
+  - `{ nugget: 1, subscribe: "event" }`: گوش دادن به یک رویداد؛
+  - `{ nugget: 1, hello: true }`: صفحه بارگذاری شده است؛
+  - `{ nugget: 1, height }`: ارتفاع پانل.
+- **برنامه به صفحه:**
+  - `{ nugget: 1, id, result }` یا `{ nugget: 1, id, error }`: یک پاسخ؛
+  - `{ nugget: 1, event, data }`: یک رویداد.

@@ -1,0 +1,13 @@
+{
+  "title": "插件 SDK",
+  "pages": [
+    "index",
+    "manifest",
+    "content",
+    "pages",
+    "api",
+    "security",
+    "publishing"
+  ],
+  "icon": "Puzzle"
+}

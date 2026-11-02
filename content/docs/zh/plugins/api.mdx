@@ -1,0 +1,137 @@
+---
+title: "API 参考"
+description: "插件方法、权限、结果类型和事件。"
+---
+
+页面使用 `nugget.call(method, params)` 调用方法，并使用 `nugget.on(event, handler)` 监听事件；参见 [编写页面](/zh/docs/plugins/pages)。
+
+如果插件没有获得方法所需的权限，调用会失败，并说明缺少哪项权限。插件停用时的方法调用也会失败。
+
+## 方法 [#methods]
+
+### 应用程序 [#app]
+
+| 方法 | 权限 | 参数 | 返回值 |
+| --- | --- | --- | --- |
+| `app.info` | — | | `{ version, language, platform, plugin: { id, version, permissions } }` |
+| `app.theme` | — | | SDK 应用的主题；参见[下文](#apptheme)。 |
+| `ui.toast` | — | `{ text, kind? }` | `null`。显示一个短消息，前缀为插件名称。`kind` 可以是 `"info"`（默认）、`"success"` 或 `"error"`。最多每 1.5 秒一次。 |
+| `storage.get` | — | `{ key }` | 存储的 JSON 值，或 `null`。 |
+| `storage.set` | — | `{ key, value }` | `null`。`value` 可以是任何 JSON 值；`null` 删除该键。键最长 200 个字符，总体最大 1 MB。 |
+| `notify` | `notifications` | `{ title, body }` | `null`。系统通知，标题为“插件名称：标题”。每10秒最多一次。用户可能已关闭通知。 |
+
+### 连接 [#connection]
+
+| 方法 | 权限 | 参数 | 返回值 |
+| --- | --- | --- | --- |
+| `vpn.status` | `state` | | 一个[状态对象](#state)。 |
+| `vpn.traffic` | `state` | | 一份[流量数据](#traffic)。 |
+| `vpn.connect` | `control` | `{ server? }` | 一个[状态对象](#state)。连接到 `servers.list` 中指定 ID 的服务器，或应用中选中的服务器。连接成功后 Promise 完成；所有服务器均无法连接时 Promise 拒绝。 |
+| `vpn.disconnect` | `control` | | `null` |
+| `connections.list` | `connections` | | 打开的连接；参见 [下文](#connection)。 |
+
+### 服务器和路由 [#servers-and-routing]
+
+| 方法 | 权限 | 参数 | 返回值 |
+| --- | --- | --- | --- |
+| `servers.list` | `profiles` | | `[{ id, name, protocol, host, favorite, subscription }]`。`subscription` 是订阅的域名，或 `null`。链接不会是域名，因为它们包含凭证。 |
+| `servers.add` | `import` | `{ link, name? }` | `null`。通过共享链接（`vless://`，`ss://`，…）添加服务器。 |
+| `subscriptions.add` | `import` | `{ url }` | `null`。添加并获取订阅。 |
+| `routing.addRule` | `routing` | `{ kind, values, action, invert? }` | `null`。在用户路由的末尾添加规则，并注明是你的插件添加的，同时应用该规则。 |
+
+`routing.addRule`:
+
+| 参数 | |
+| --- | --- |
+| `kind` | `apps`（程序名称），`domains`，`ip`（地址和 CIDR 范围），`domain_regex`，`port`（数字和范围，如 `8000-8080`），`protocol`（`bittorrent`，`quic`，…），`geosite`，`geoip`（国家代码如 `ru`），`network`（`tcp`，`udp`），`ruleset`（规则列表 URL）。 |
+| `values` | 匹配的值，最多 5000 个。 |
+| `action` | `proxy`（通过 VPN），`direct`，或 `block`。 |
+| `invert` | 匹配所有值未匹配的内容。 |
+
+## 事件 [#events]
+
+| 事件 | 权限 | 数据 |
+| --- | --- | --- |
+| `vpn.state` | `state` | 一个[状态对象](#state)：订阅时发送一次，此后每次状态变化时发送。 |
+| `vpn.traffic` | `state` | 连接期间每秒发送一份[流量数据](#traffic)。 |
+| `app.theme` | — | 用户每次更改主题时发送[主题数据](#apptheme)。SDK 会自动应用主题。 |
+
+## 类型 [#types]
+
+### 状态 [#state]
+
+```json
+{
+  "status": "connected",
+  "server": "Frankfurt 1",
+  "server_id": "p-de",
+  "since": 1790000000000,
+  "reconnecting": false,
+  "blocked": false,
+  "error": null
+}
+```
+
+| 字段 | |
+| --- | --- |
+| `status` | `idle`，`connecting`，`connected` 或 `error`。 |
+| `server`，`server_id` | 服务器，正在连接或已连接时。 |
+| `since` | 当隧道建立时，以 Unix 毫秒为单位。 |
+| `reconnecting` | 隧道掉线并正在恢复。 |
+| `blocked` | 杀开关正在阻止所有流量。 |
+| `error` | 出了什么问题，当 `status` 是 `error` 时。 |
+
+### 流量 [#traffic]
+
+```json
+{ "up": 12000000, "down": 340000000, "up_rate": 42000, "down_rate": 1830000, "total_up": 0, "total_down": 0 }
+```
+
+`up` 和 `down` 是此会话的字节数；速率是每秒字节数。
+
+### 连接 [#connection-1]
+
+```json
+{
+  "id": "…",
+  "network": "tcp",
+  "protocol": "tls",
+  "host": "www.example.com",
+  "destination": "93.184.216.34:443",
+  "app": "chrome.exe",
+  "rule": "rule-1",
+  "route": "proxy",
+  "server": "p-de",
+  "upload": 1200,
+  "download": 48000,
+  "started": 1790000000000
+}
+```
+
+`rule` 是匹配的路由规则的 ID，`"__default"` 用于其他所有情况，或 `""` 用于应用自己路由的连接。
+
+### app.theme [#apptheme]
+
+```json
+{
+  "mode": "dark",
+  "colors": { "background": "oklch(…)", "foreground": "…", "primary": "…" },
+  "radius": "0.625rem",
+  "font": "…",
+  "language": "en",
+  "dir": "ltr"
+}
+```
+
+## 低级协议 [#low-level-protocol]
+
+SDK 包装了 `postMessage`。除非你正在编写自己的 SDK，否则不需要这个：
+
+- **页面到应用:**
+  - `{ nugget: 1, id, method, params }`：一个调用；
+  - `{ nugget: 1, subscribe: "event" }`：监听一个事件；
+  - `{ nugget: 1, hello: true }`：页面已加载；
+  - `{ nugget: 1, height }`：面板的高度。
+- **应用到页面:**
+  - `{ nugget: 1, id, result }` 或 `{ nugget: 1, id, error }`：一个回答；
+  - `{ nugget: 1, event, data }`：一个事件。

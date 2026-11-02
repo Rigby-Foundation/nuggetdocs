@@ -1,0 +1,32 @@
+---
+title: "协议与配置格式"
+description: "支持的服务器系列、传输方式和导入格式。"
+---
+
+协议支持取决于[所选核心](/zh/docs/reference/cores)。使用内置核心作为兼容性基线。
+
+## 服务器协议 [#server-protocols]
+
+客户端支持VLESS、VMess、Trojan、Shadowsocks、Hysteria、Hysteria2、TUIC、WireGuard、SOCKS、HTTP和SSH。
+
+VLESS支持Reality与XTLS Vision。内置的TodayCore实现还包括Reality，使用`X25519MLKEM768`密钥共享和VLESS后量子加密。
+
+## 传输 [#transports]
+
+支持的传输类别包括 TCP、WebSocket、gRPC、HTTP/2、HTTPUpgrade 和 XHTTP。传输必须同时被所选核心和服务器配置支持。
+
+- **XHTTP:** 使用内置核心或 Xray。
+- **Hysteria、Hysteria2、TUIC、SSH:** 使用除 Xray 之外的核心。
+- **Shadowsocks 插件:** 无法通过 Xray 使用。
+
+## 导入格式 [#import-formats]
+
+解析器接受常见协议分享链接、订阅、完整的 sing-box JSON 和 Clash 配置。对于完整的 Clash 配置，mihomo 保留预期的 Clash 运行时行为。
+
+添加对话框可以解码二维码图像。`nuggetvpn://` 深度链接和复制到剪贴板的受支持连接链接也可以用于导入。
+
+请参阅 [配置文件和订阅](/zh/docs/guides/profiles) 了解导入工作流程。
+
+## 不受支持的 Rigby 配置文件 [#unsupported-rigby-profiles]
+
+`rigby://` 配置文件可能会出现在列表中，但无法连接。该协议存在于 clash-rs 的一个分支中，且嵌入式核心未实现。请向提供方获取受支持的连接格式。

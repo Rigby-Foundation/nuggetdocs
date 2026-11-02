@@ -1,0 +1,77 @@
+---
+title: "plugin.json 参考"
+description: "每个清单字段、文件约束和包限制。"
+---
+
+每个插件在其 zip 根目录都有一个 `plugin.json`。
+
+```json
+{
+  "format": 1,
+  "id": "com.example.weather",
+  "name": "Server weather",
+  "version": "1.0.0",
+  "author": "You",
+  "description": "What it does, in a sentence or two.",
+  "homepage": "https://example.com/weather",
+  "icon": "icon.png",
+
+  "themes": [ … ],
+  "fonts": [ … ],
+  "routing": [ … ],
+
+  "panel": { "title": "Weather", "file": "panel.html" },
+  "background": "background.html",
+
+  "permissions": ["state", "profiles", "notifications"],
+  "network": ["status.example.com"]
+}
+```
+
+## 关于插件 [#about-the-plugin]
+
+| 字段 | 必填 | |
+| --- | --- | --- |
+| `format` | 是 | 始终 `1`。较新的应用可能会读取更新的格式；此应用拒绝其他格式并会提示。 |
+| `id` | 是 | 您插件的永久 ID。使用 3–64 个小写字母、数字、`.`、`-` 和 `_`，以字母或数字开头和结尾。反向域名效果很好：`com.example.weather`。更新必须保持相同的 ID。 |
+| `name` | 是 | 最多 60 个字符。 |
+| `version` | 是 | 任意由字母、数字、`.`、`+` 和 `-` 组成的版本字符串，最多 32 个字符。显示给用户；应用不会比较版本。 |
+| `author` | | 最多80个字符。 |
+| `description` | | 最多500个字符，显示在安装提示和插件列表中。 |
+| `homepage` | | 一个`https://`地址。显示在屏幕上，应用不会打开它。 |
+| `icon` | | 插件中的PNG、JPEG、WebP或SVG文件。显示为正方形，36–40像素。 |
+
+## 内容 [#content]
+
+| 字段 | |
+| --- | --- |
+| `themes` | 自定义主题。参见[内容](/zh/docs/plugins/content#themes)。 |
+| `fonts` | 字体文件。参见[内容](/zh/docs/plugins/content#fonts)。 |
+| `routing` | `.vflow`路由设置。参见[内容](/zh/docs/plugins/content#routing-setups)。 |
+
+## 页面 [#pages]
+
+| 字段 | |
+| --- | --- |
+| `panel` | `{ "title": "…", "file": "panel.html" }`：在“设置 → 插件”中显示插件下的页面。`title`最多40个字符，默认是插件名称。 |
+| `background` | `"background.html"`：插件开启时保持运行的页面。 |
+
+参见 [编写页面](/zh/docs/plugins/pages)。
+
+## 访问 [#access]
+
+| 字段 | |
+| --- | --- |
+| `permissions` | 插件的页面可能执行的操作。参见 [权限](/zh/docs/plugins/security#permissions)。只请求你使用的权限；安装提示会列出所有权限。 |
+| `network` | 你的页面可能访问的主机名，通过 `https` 和 `wss`，例如 `api.example.com` 或 `*.example.com`。其他内容无法访问。IP 地址、`localhost` 以及本地名称（`.local`、`.lan`、`.internal`、`.home.arpa`）将被拒绝。仅允许有页面的插件访问。 |
+
+## 文件 [#files]
+
+文件名可以使用字母、数字、`.`、`-` 和 `_`，文件夹通过 `/` 分隔。名称不能以点开头。清单中列出的每个文件必须在插件中，并且具有正确类型的扩展名。
+
+一个插件最大可以为 50 MB，最多包含 500 个文件，每个文件最大 25 MB，解压后总大小为 80 MB。
+
+文件将根据扩展名决定类型进行提供。其他任何内容都不提供：
+
+`.html`、`.js`、`.mjs`、`.css`、`.json`、`.svg`、`.png`、`.jpg`、`.jpeg`、
+`.webp`、`.gif`、`.ttf`、`.otf`、`.woff`、`.woff2`、`.txt`

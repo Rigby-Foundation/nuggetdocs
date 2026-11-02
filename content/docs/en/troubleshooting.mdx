@@ -1,0 +1,73 @@
+---
+title: "Troubleshooting"
+description: "Work through installation, import, connection, and routing problems."
+icon: "Wrench"
+---
+
+## Start with a small check
+
+1. Confirm your normal internet connection works.
+2. Confirm that your provider subscription is active and refresh it.
+3. Try a different server from the same source.
+4. Check **Settings → Core** against the [compatibility table](/en/docs/reference/cores).
+5. Turn on [logging](/en/docs/guides/monitoring#logs), reproduce the error, and read the failure message.
+
+## macOS says the app is damaged
+
+macOS builds are ad-hoc signed rather than signed with an Apple Developer certificate, so Gatekeeper may block the downloaded app.
+
+For an official release you trust, remove quarantine attributes from the installed app:
+
+```bash
+xattr -cr /Applications/NuggetVPN.app
+```
+
+Open the app again. This command assumes you placed it in `/Applications`.
+
+## The desktop permission prompt fails
+
+Creating the TUN interface requires administrator rights. Approve the system prompt on the first connection of an app session. On Linux, check that polkit and `pkexec` are available.
+
+Start the graphical app as your normal user. It starts its own privileged service; the graphical interface does not need to run as root.
+
+## A subscription will not import
+
+Check that you pasted the subscription endpoint rather than the provider’s account or payment page. The response needs to contain server data in a supported format.
+
+If the provider restricts client identity or device IDs, review **Settings → Subscription identity** and the provider’s instructions. Do not publish the subscription URL when asking for help: it can grant access to your account’s servers.
+
+## A server says it needs another core
+
+Use [Core compatibility](/en/docs/reference/cores). XHTTP requires the built-in core or Xray; Xray cannot run Hysteria, Hysteria2, TUIC, or SSH. `rigby://` profiles do not connect with any embedded core.
+
+## Connected, but websites do not load
+
+Inspect **Routing → Everything else** and rule order. A matching Block rule can stop a request, and a Direct rule can bypass the tunnel. Check **Network connections** to see the rule and server used.
+
+Next, inspect DNS under **Settings → Connection** and any DNS assigned to the domain rule. If large transfers stall, try a lower MTU and compare the same transfer.
+
+## Traffic is blocked after a connection drops
+
+If the kill switch is enabled, blocking during an unexpected outage is expected. Reconnect to restore the tunnel, or press **Disconnect** to intentionally release the block. See [kill switch behaviour](/en/docs/guides/connection#kill-switch).
+
+## A routing rule has no effect
+
+An empty rule matches nothing. A broader rule above yours may match first. Open **Order**, check the sequence, then generate a new connection and inspect it in **Network connections**.
+
+With mihomo, detected-protocol rules and sing-box-format rule lists are skipped. Deleted specific-server destinations fall back to the connected server.
+
+## iOS installs but never connects
+
+Check the signing certificate. The unsigned IPA needs Network Extension and packet-tunnel capabilities. Signing with a free Apple ID does not provide the required entitlement. See [iOS setup](/en/docs/getting-started/mobile#ios).
+
+## Wi-Fi name is hidden
+
+The OS may require location permission before exposing the SSID. Check the system’s privacy settings or add trusted network names manually under **Settings → Wi-Fi**.
+
+## There is nothing in Logs
+
+Logging is off by default in release builds. Enable it from **Logs** or **Settings → Privacy**, reproduce the issue, then inspect the output. Turning it off deletes the saved log.
+
+## Report a reproducible issue
+
+Use [GitHub Issues](https://github.com/Rigby-Foundation/NuggetVPN/issues). Include your OS, app version, selected core, protocol and transport, steps to reproduce, and the relevant error. Review logs and configuration excerpts before sharing credentials or connection details.

@@ -1,0 +1,17 @@
+{
+  "title": "Guides",
+  "pages": [
+    "profiles",
+    "servers",
+    "connection",
+    "routing",
+    "routing-setups",
+    "dns",
+    "chains",
+    "monitoring",
+    "automation",
+    "appearance",
+    "backups"
+  ],
+  "icon": "BookOpen"
+}

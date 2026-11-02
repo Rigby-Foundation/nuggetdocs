@@ -1,0 +1,66 @@
+---
+title: "نصب NuggetVPN"
+description: "یک نصاب دسکتاپ انتخاب کنید، یک نسخه را دانلود کنید و برنامه را اجرا کنید."
+---
+
+نسخه‌ها را از [رسمی GitHub releases](https://github.com/Rigby-Foundation/NuggetVPN/releases) دانلود کنید. از یک بسته برای سیستم عامل و پردازنده خود استفاده کنید.
+
+## نصب دسکتاپ [#desktop-installation]
+
+<Tabs items={['Windows', 'macOS', 'Linux']}>
+<Tab value="Windows">
+نصاب NSIS را از Releases دانلود و اجرا کنید. Windows از WebView2 برای نمایش برنامه استفاده می‌کند.
+
+برای نصب خودکار، این را در PowerShell اجرا کنید:
+
+```powershell
+irm https://raw.githubusercontent.com/Rigby-Foundation/NuggetVPN/main/scripts/install.ps1 | iex
+```
+
+اسکریپت آخرین نسخه را دانلود می‌کند، digest SHA-256 منتشر شده توسط GitHub را بررسی می‌کند، آن را نصب می‌کند و برنامه را شروع می‌کند. اجرای مجدد آن نصب را به‌روزرسانی می‌کند.
+
+برای نصب بدون نظارت، از دارایی نسخه‌ای که با `-silent-installer.exe` ختم می‌شود استفاده کنید، یا `/S` را به نصب‌کننده معمولی بدهید.
+</Tab>
+<Tab value="macOS">
+`.dmg` را از Releases دانلود کرده و **NuggetVPN** را به **برنامه‌ها** منتقل کنید. برای مک خود Apple silicon یا Intel را انتخاب کنید، یا اگر ارائه شده، نسخه یونیورسال را انتخاب کنید.
+
+همچنین می‌توانید از اسکریپت نصب‌کننده استفاده کنید:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/Rigby-Foundation/NuggetVPN/main/scripts/install.sh | sh
+```
+
+اسکریپت قبل از نصب و راه‌اندازی، نسخه را دانلود و بررسی می‌کند. اجرای مجدد آن برنامه را به‌روزرسانی می‌کند.
+
+اگر macOS می‌گوید برنامه خراب است، به [رفع اشکال Gatekeeper](/fa/docs/troubleshooting#macos-says-the-app-is-damaged) مراجعه کنید.
+</Tab>
+<Tab value="Linux">
+یک `.deb`، `.rpm`، یا `.AppImage` از Releases انتخاب کنید. برنامه در زمان اجرا به GTK 4 و WebKitGTK 6 نیاز دارد، به‌علاوه `pkexec` polkit برای ارتقای دسکتاپ.
+
+اسکریپت نصب‌کننده زمانی که apt، dnf، یا zypper در دسترس باشد، یک `.deb` یا `.rpm` را انتخاب می‌کند و در غیر این صورت یک AppImage را انتخاب می‌کند:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/Rigby-Foundation/NuggetVPN/main/scripts/install.sh | sh
+```
+
+این اسکریپت چک‌سام نسخه را بررسی می‌کند، برنامه را نصب می‌کند و آن را اجرا می‌کند. اجرای دوباره آن نصب شما را به‌روز می‌کند.
+
+برای یک AppImage که به‌صورت دستی دانلود شده است، قبل از باز کردن آن آن را قابل اجرا کنید:
+
+```bash
+chmod +x ./NuggetVPN*.AppImage
+```
+</Tab>
+</Tabs>
+
+## اولین اجرا [#first-launch]
+
+برنامه را به‌عنوان کاربر معمولی خود باز کنید. در دسکتاپ، اولین اتصال در هر جلسه برنامه، دسترسی مدیر را برای ایجاد رابط شبکه TUN درخواست می‌کند. رابط گرافیکی همچنان به‌عنوان کاربر شما اجرا می‌شود؛ تونل در یک سرویس جداگانه با دسترسی‌های ویژه اجرا می‌شود.
+
+برنامه به تنظیمات سرور نیاز دارد. با [اولین اتصال شما](/fa/docs/getting-started/first-connection) ادامه دهید.
+
+## به‌روزرسانی‌ها [#updates]
+
+نسخه‌های دسکتاپ می‌توانند داخل برنامه به‌روزرسانی‌ها را بررسی و نصب کنند. شما همچنین می‌توانید یک اسکریپت نصب را مجدداً اجرا کنید یا نسخه‌ای جدیدتر را به‌صورت دستی نصب کنید. قبل از انتقال یک نصب به دستگاه دیگر، یک [پشتیبان](/fa/docs/guides/backups) ذخیره کنید.
+
+برای فایل‌های APK Android و فایل IPA امضا نشده iOS، راهنمای موبایل [را دنبال کنید](/fa/docs/getting-started/mobile).

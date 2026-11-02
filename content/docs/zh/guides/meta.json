@@ -1,0 +1,17 @@
+{
+  "title": "使用指南",
+  "pages": [
+    "profiles",
+    "servers",
+    "connection",
+    "routing",
+    "routing-setups",
+    "dns",
+    "chains",
+    "monitoring",
+    "automation",
+    "appearance",
+    "backups"
+  ],
+  "icon": "BookOpen"
+}

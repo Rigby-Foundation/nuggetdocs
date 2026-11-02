@@ -1,0 +1,61 @@
+---
+title: "架构"
+description: "用户界面、特权服务和嵌入式核心如何协同工作。"
+---
+
+## 一个二进制文件，两个桌面模式 [#one-binary-two-desktop-modes]
+
+```text
+NuggetVPN                  GUI, running as the user
+NuggetVPN --core-service   Privileged tunnel service
+```
+
+GUI 通过平台的授权流程启动自身的另一个副本：`osascript` 在 macOS 上，`pkexec` 在 Linux 上，或者 UAC 在 Windows 上。因此双方使用相同的应用版本。
+
+```text
+React + Wails UI  ←→  Authenticated socket  ←→  Core service
+    user                  JSON lines              admin
+                                              TUN, DNS, routing
+                                              embedded engines
+```
+
+特权服务在进程内调用核心库。日志、连接状态、字节计数器和实时连接列表通过相同的套接字返回。退出 GUI 会关闭服务；服务也会监控 GUI 进程，以防崩溃导致服务仍持有路由表。
+
+## 套接字认证 [#socket-authentication]
+
+每个服务连接必须首先提供一个每会话 256 位的令牌。GUI 将它写入 `0600` 文件，高权限进程读取并删除该文件，未经认证的连接会在不暴露状态的情况下被关闭。
+
+通过文件传递令牌可以避免在 Linux 的世界可读命令行中发布它。显式认证也涵盖了 Unix 套接字 chmod 和 chown 不强制预期访问边界的平台。
+
+## 嵌入式引擎 [#embedded-engines]
+
+内置的 TodayCore fork 通过 Go `replace` 指令保持 sing-box 的模块路径。官方 sing-box 和 sing-tun 在 `third_party/` 下有独立的模块路径，以便两个实现可以共存。
+
+mihomo 处理完整的 Clash 配置。Xray 在内置核心后端运行连接的服务端，它保留了 TUN、DNS 和路由。受保护的回环入口点直接传输 Xray 的传输，以避免自我路由。
+
+没有启动核心 HTTP 控制器。流量统计和连接检查在进程内读取，从导入的 Clash 配置中移除了控制器选项。
+
+## 源映射 [#source-map]
+
+| 路径 | 责任 |
+| --- | --- |
+| `main.go` | 入口点、GUI/服务分发、窗口和系统托盘。 |
+| `internal/app/` | 向前端公开的服务。 |
+| `internal/core/` | 特权服务、IPC 客户端和进程内运行时。 |
+| `internal/sbconfig/` | 配置 sing-box 的个人资料和设置；路由编译。 |
+| `internal/cores/` | mihomo 和 Xray 配置翻译。 |
+| `internal/link/` | 分享链接、sing-box JSON 以及 Clash YAML 解析。 |
+| `internal/remote/` | 订阅和可选的个人资料同步。 |
+| `internal/probe/` | 延迟和连接性检查。 |
+| `internal/stats/`, `internal/speedtest/` | 存储的测量数据和速度测试。 |
+| `internal/plugins/` | 插件打包、验证、提供和沙箱策略。 |
+| `internal/cli/` | 桌面命令行和控制套接字。 |
+| `internal/storage/`, `internal/models/` | 持久化和共享类型。 |
+| `frontend/` | React 应用、后端桥接和翻译。 |
+| `Taskfile.yml`, `build/` | 构建和打包任务。 |
+
+## Android 边界 [#android-boundary]
+
+Android 的 VpnService 为隧道提供服务，而不是特权桌面进程。`internal/android` 将接口传递给 sing-box，将核心套接字保留在 VPN 外，并报告当前网络。一小型 Java 主机将 Go 共享库加载到 WebView 应用中。
+
+请参阅 [build ](/zh/docs/developers/building) 来运行项目，以及 [plugin security](/zh/docs/plugins/security) 以获取扩展边界。

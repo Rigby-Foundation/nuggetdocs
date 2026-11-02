@@ -1,0 +1,40 @@
+---
+title: "Shortcuts and Wi-Fi rules"
+description: "Control desktop connections from a shortcut, network changes, or a script."
+---
+
+These controls apply to desktop. Android does not provide Wi-Fi rules, the global shortcut, launch at login, or the command line.
+
+## Global shortcut
+
+Set a key combination under **Settings → Behaviour → Shortcut**. It connects or disconnects even when the window is hidden, using the last-picked server.
+
+Use the clear control to remove the shortcut. Choose a combination that does not conflict with another application.
+
+## Wi-Fi rules
+
+Open **Settings → Wi-Fi** to manage trusted network names.
+
+- **Connect on untrusted networks** connects to the last-used server when you join a Wi-Fi network that is not trusted.
+- **Disconnect on trusted networks** disconnects when you join a trusted network.
+
+Use **Trust** for the current network, or add a name to the trusted list manually. A trusted network is one where you have chosen not to need the VPN; its name is not a security guarantee.
+
+### If the network name is hidden
+
+Some operating systems require location permission to expose the Wi-Fi name. Allow the app to read it in the system’s privacy settings, or enter trusted network names yourself. The app reports when Wi-Fi lookup is unsupported.
+
+## Terminal and scripts
+
+The [command line](/en/docs/reference/cli) controls an already-running desktop instance:
+
+```bash
+NuggetVPN status
+NuggetVPN connect Tokyo
+NuggetVPN setup Work
+NuggetVPN disconnect
+```
+
+Add `--json` for structured results and use exit codes to detect failures. The app can be minimised to the tray, but must remain running.
+
+For time-based routing changes, use [routing schedules](/en/docs/guides/routing-setups#schedule-a-setup).

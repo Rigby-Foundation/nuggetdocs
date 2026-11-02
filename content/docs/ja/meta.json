@@ -1,0 +1,14 @@
+{
+  "title": "ドキュメント",
+  "pages": [
+    "index",
+    "getting-started",
+    "---NuggetVPN の使い方---",
+    "guides",
+    "reference",
+    "troubleshooting",
+    "---Nugget で開発---",
+    "plugins",
+    "developers"
+  ]
+}

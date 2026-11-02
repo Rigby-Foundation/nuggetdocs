@@ -1,0 +1,52 @@
+---
+title: "Your first connection"
+description: "Import a subscription or server, select it, and bring the tunnel online."
+---
+
+Have your provider’s subscription URL or server share link ready. A subscription is usually an `https://` URL. A single server link starts with a protocol such as `vless://`, `vmess://`, `trojan://`, or `ss://`.
+
+<Steps>
+<Step>
+### Add your connection
+
+Open **Profiles & subscriptions** and choose **Add**, or use the add button in the app’s navigation. In **Add a profile or subscription**, paste the link into **Paste your connection link**.
+
+For an HTTP or HTTPS URL, the button becomes **Import subscription**. For a server link or sing-box JSON, you can give the profile a name and choose **Add profile**.
+</Step>
+<Step>
+### Choose a source and server
+
+Select the subscription or profile you just added. For a subscription with several servers, open **Servers** and pick a server, or use automatic selection. A single full configuration may have no separate server list.
+
+Leave **Settings → Core** on **Built-in sing-box** unless your configuration requires a different core.
+</Step>
+<Step>
+### Connect
+
+Go to **Home** and press the connection button. Accept the platform’s VPN or administrator prompt. On desktop, this prompt creates the tunnel service for the current app session.
+
+Wait for **Connected**. The server shown while connected is the server the core actually uses; a fastest-server recommendation alone does not mean the VPN is active.
+</Step>
+<Step>
+### Check the connection
+
+Open a website and watch the live traffic counters. You can also run the speed test from **Home** or inspect requests under **Network connections**.
+
+Press the connection button again when you want to disconnect.
+</Step>
+</Steps>
+
+## Import from a QR code
+
+The add dialog can read a QR image selected from disk or pasted into the dialog. On Android, you can also scan using the camera. Review the decoded link, then import it.
+
+## If it does not connect
+
+Check that your subscription has not expired, try another server, and confirm that the selected core supports the protocol. The [troubleshooting guide](/en/docs/troubleshooting) explains how to turn on logs and narrow down a failure.
+
+## Next steps
+
+<Cards>
+<Card title="Manage subscriptions" href="/en/docs/guides/profiles" description="Refresh sources and understand data and expiry information." />
+<Card title="Set up routing" href="/en/docs/guides/routing" description="Choose what uses the VPN and what bypasses it." />
+</Cards>

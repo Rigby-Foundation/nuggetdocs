@@ -1,0 +1,93 @@
+---
+title: "ソースからのビルド"
+description: "Wailsをセットアップし、組み込みコアをビルドし、クライアントをパッケージ化します。"
+---
+
+NuggetVPNはGo、Wails v3、およびReact 19を使用します。すべてのプロキシランタイムはGoライブラリとしてアプリにリンクされます。
+
+## 前提条件 [#prerequisites]
+
+- Go 1.26以上。
+- フロントエンド用のBunまたはNode.js。
+- Wails CLI v3.0.0。CLI、Goモジュール、および`@wailsio/runtime`を同期させてください。
+- 下記のプラットフォームビルドツール。
+
+```bash
+go install github.com/wailsapp/wails/v3/cmd/wails3@v3.0.0
+```
+
+| プラットフォーム | ビルドツール |
+| --- | --- |
+| macOS | Xcode コマンドラインツール: `xcode-select --install`。 |
+| Linux | Cツールチェーン、`libgtk-4-dev`、および`libwebkitgtk-6.0-dev`。`pkexec`はランタイム時に必要です。 |
+| Windows | インストーラパッケージ用のWebView2およびNSIS。 |
+
+## クローンして実行 [#clone-and-run]
+
+```bash
+git clone https://github.com/Rigby-Foundation/NuggetVPN.git
+cd NuggetVPN
+make dev
+```
+
+## ビルドして検証 [#build-and-validate]
+
+```bash
+make build
+make test
+make vet
+```
+
+`make build`は`bin/`に書き込みます。スタンドアロンフロントエンドを確認するには：
+
+```bash
+cd frontend
+bun run build
+```
+
+## ビルドタグが必要です [#build-tags-are-required]
+
+リポジトリのMakeおよびWailsタスクを使用します。`Taskfile.yml`は`SING_BOX_TAGS`を定義し、`buildtags.go`は不足している必要なタグをコンパイルエラーにします。
+
+| タグ | 機能 |
+| --- | --- |
+| `with_utls` | Reality. |
+| `with_quic` | Hysteria、Hysteria2、およびTUIC. |
+| `with_wireguard` | WireGuard. |
+| `with_clash_api` | 進行中のトラフィック会計中；HTTPコントローラーは開かれていません。 |
+| `with_gvisor` | 手動で構成を要求する場合のレガシーgVisorスタック。 |
+
+手動のGoビルドの場合、Makeからタグを取得してください：
+
+```bash
+go build -tags "$(make -s tags)" .
+```
+
+## デスクトップパッケージ [#desktop-packages]
+
+| コマンド | 出力 |
+| --- | --- |
+| `make dmg` | `bin/NuggetVPN.dmg` |
+| `make dmg-universal` | ユニバーサルarm64 + amd64 DMG。 |
+| `make linux-packages` | DEB、RPM、およびAppImageが`bin/`にあります。 |
+| `make package`がWindows上にあります | 実行可能ファイルとNSISインストーラー。 |
+
+## Androidビルド [#android-builds]
+
+NDKのために`ANDROID_NDK_HOME`を設定します。APKビルドにはJDK 17とAndroidSDKも`ANDROID_HOME`を通して必要です。
+
+```bash
+wails3 task android:apk
+wails3 task android:package
+wails3 task android:run:device
+```
+
+これらは、それぞれデバッグ用のarm64 APK、リリース用のarm64およびx86_64 APK、接続されたデバイス上でのデバッグビルドを構築します。リリース署名はリリースワークフローの`ANDROID_KEYSTORE_*`シークレットを通じて設定されています。
+
+## 変更の貢献について [#contributing-changes]
+
+フロントエンドの呼び出しは、エクスポートされたメソッド下の`internal/app/`に向けて`frontend/src/lib/backend.ts`を通過します。バックエンドメソッドを追加する際には、ブリッジコマンドテーブルにエントリを追加してください。`bridge_test.go`は両側が一致しているかを確認します。
+
+生成された設定に対する変更については、`internal/sbconfig/build_test.go`を拡張してください。これらのテストは設定を実際のコアオプションパーサーに通し、Realityアウトバウンドを構築します。変更されたプロトコルも実際のサーバーで確認してください。
+
+クライアントは[GPL-3.0](https://github.com/Rigby-Foundation/NuggetVPN/blob/main/LICENSE)の下でライセンスされています。リポジトリの[貢献ガイド](https://github.com/Rigby-Foundation/NuggetVPN/blob/main/CONTRIBUTING.md)を参照してください。

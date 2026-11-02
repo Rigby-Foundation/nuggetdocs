@@ -1,0 +1,43 @@
+---
+title: "Routing setups and schedules"
+description: "Save separate routes, import .vflow files, and switch setups by time."
+---
+
+A setup contains a complete routing configuration. Keep separate setups for home, work, or another use, and switch from **Routing** or the desktop tray.
+
+## Create and switch
+
+Use the setup controls in **Routing** to create, duplicate, rename, or delete a setup. Pick its name to make it active. Deleting a setup removes all its rules and cannot be undone.
+
+On desktop, you can list or switch setups from the [command line](/en/docs/reference/cli):
+
+```bash
+NuggetVPN setup
+NuggetVPN setup Work
+```
+
+## Start from a preset
+
+Built-in presets include blocking ads and trackers, blocking QUIC, sending torrents directly, and bypassing the VPN for a country.
+
+Review the added rules and their order. In particular, **Torrents direct** and **Direct for a country** intentionally send matching traffic outside the VPN.
+
+## Geo data and remote lists
+
+Service and country rules can use custom GeoSite and GeoIP data. Manage the files through the routing geo-data controls. Category suggestions depend on the data you have loaded.
+
+Remote rule lists may be downloaded when you connect and refreshed by the core. The editor shows their status and provides **Update lists now**. Make sure the chosen core supports the format: mihomo skips sing-box `.srs` and `.json` lists and uses its own geo data.
+
+## Share a .vflow file
+
+Use **Routing → Export** to save a routing setup and **Import** to load one. A `.vflow` file contains routing, not a complete app backup.
+
+Specific-server destinations depend on profile IDs on the original computer. Those references may be missing on another installation; review them after importing. Generic VPN, Direct, and Block destinations are easier to share.
+
+Plugins can supply setups under **Routing → From plugins**. Applying one replaces the current routing, and you can undo that action.
+
+## Schedule a setup
+
+The schedule controls in **Routing** can switch setups by time of the week. Choose the setup, weekdays, and start and end times—for example, **Work** on weekdays from 09:00 to 18:00.
+
+Review the schedule after changing the computer’s time or timezone. The app must be running for its scheduling controls to take effect.

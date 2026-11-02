@@ -1,0 +1,99 @@
+---
+title: "ساخت صفحه‌های افزونه"
+description: "از SDK جاوااسکریپت، متغیرهای تم، رویدادها و ذخیره‌سازی استفاده کنید."
+---
+
+یک پلاگین می‌تواند دو صفحه داشته باشد، هر دو HTML ساده:
+
+- یک **پنل** ، که در قسمت تنظیمات → پلاگین‌ها، زیر پلاگین نمایش داده می‌شود؛
+- یک **صفحهٔ پس‌زمینه** است که در حالی که افزونه فعال است، به‌طور پنهان اجرا می‌شود. از آن استفاده کنید تا به رویدادها واکنش نشان دهید، مثل دریافت اطلاعیه زمانی که اتصال قطع می‌شود.
+
+## SDK [#the-sdk]
+
+SDK را شامل کنید و از `nugget` جهانی استفاده کنید:
+
+```html
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="/plugins/_sdk/nugget.js"></script>
+</head>
+<body>
+  <p id="status">…</p>
+  <script>
+    const show = (state) => {
+      document.getElementById("status").textContent = state.status;
+    };
+    nugget.call("vpn.status").then(show);
+    nugget.on("vpn.state", show);
+  </script>
+</body>
+</html>
+```
+
+| | |
+| --- | --- |
+| `nugget.call(method, params?)` | یک روش از برنامه را فرا می‌خواند. یک وعده از نتیجه آن برمی‌گرداند، یا با یک `Error` رد می‌شود که پیام آن می‌گوید چه مشکلی رخ داده است. |
+| `nugget.on(event, handler)` | به یک رویداد گوش می‌دهد. تابعی برمی‌گرداند که گوش دادن را متوقف می‌کند. |
+| `nugget.fit()` | از برنامه می‌خواهد اندازه پنل را با محتوایش تنظیم کند. SDK قبلاً این کار را هر زمان که اندازه صفحه تغییر می‌کند انجام می‌دهد. |
+
+هر روش و رویداد در [API مرجع](/fa/docs/plugins/api) آمده است.
+
+## شبیه برنامه [#looking-like-the-app]
+
+SDK صفحه را با تم کاربر پوشش می‌دهد و آن را به‌روز نگه می‌دارد:
+
+- **رنگ‌ها:** به‌صورت متغیرهای CSS روی `<html>` تنظیم شده‌اند:
+  - `--background`، `--foreground`، `--card`، `--card-foreground`;
+  - `--primary`، `--primary-foreground`، `--secondary`، `--muted`،
+ `--muted-foreground`، `--accent`;
+  - `--border`، `--input`، `--ring`، `--destructive`;
+  - `--status-connected`، `--status-connecting`، `--status-error`،
+ `--status-idle`.
+- **شکل:** `--radius`، شعاع گوشه‌های برنامه.
+- **ویژگی‌ها:** `color-scheme`، `data-theme="light|dark"`، `lang` و
+ `dir` (فارسی از راست به چپ است).
+
+زمینه صفحه را شفاف بگذارید تا مانند بخشی از برنامه باشد:
+
+```css
+html { background: transparent; color: var(--foreground); font: 13px/1.4 system-ui, sans-serif; }
+button { background: var(--primary); color: var(--primary-foreground); border: 0; border-radius: var(--radius); }
+.muted { color: var(--muted-foreground); }
+```
+
+فونت‌های خود برنامه درون صفحه در دسترس نیستند؛ از یک پشته فونت سیستم استفاده کنید یا فونت را در پلاگین بیاورید.
+
+## اندازه [#size]
+
+یک پنل به اندازه کارت پلاگین عرض دارد و با محتوای خود اندازه‌گیری می‌شود، بین ۶۰ تا ۴۰۰۰ پیکسل ارتفاع دارد. از طرح‌های `height: 100vh` اجتناب کنید: فریم ارتفاعی برابر با چیزی که در آن است را می‌گیرد.
+
+## ذخیره‌سازی چیزها [#storing-things]
+
+هر پلاگین دارای حافظه‌ای مخصوص تا ۱ مگابایت JSON است که بین راه‌اندازی مجدد و به‌روزرسانی‌ها حفظ می‌شود و هنگام حذف پلاگین پاک می‌شود:
+
+```js
+const count = (await nugget.call("storage.get", { key: "count" })) ?? 0;
+await nugget.call("storage.set", { key: "count", value: count + 1 });
+```
+
+`localStorage` و کوکی‌ها در سندباکس کار نمی‌کنند.
+
+## چه چیزهایی کار نمی‌کنند [#what-doesnt-work]
+
+صفحات در یک سندباکس اجرا می‌شوند؛ به [دستگاه‌ها و سندباکس](/fa/docs/plugins/security) مراجعه کنید. به طور خلاصه:
+
+- هیچ فرم‌ها (از جاوااسکریپت و `nugget.call` استفاده کنید);
+- هیچ پنجره پاپ‌آپ، `alert` یا پنجره جدید;
+- هیچ فریم تو در تو;
+- هیچ `eval` یا `new Function`;
+- هیچ شبکه‌ای به جز میزبان‌های موجود در `network`;
+- هیچ اسکریپت، استایل یا تصویری از هیچ‌جا جز پلاگین خودتان استفاده نکنید.
+
+لینک‌های فایل‌های خود پلاگین با مسیرهای مطلق، 
+`/plugins/<your id>/file.png`، یا مسیرهای نسبی کار می‌کنند.
+
+## اشکال‌زدایی [#debugging]
+
+در یک نسخه توسعه‌ای (`make dev`)، با نگه داشتن Shift و کلیک راست روی صفحه گزینه Inspect را انتخاب کنید تا ابزارهای توسعه‌دهنده باز شوند، سپس فریم پلاگین خود را در انتخابگر زمینه کنسول انتخاب کنید. خروجی `console.log` آنجا نمایش داده می‌شود.

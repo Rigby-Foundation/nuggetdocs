@@ -1,0 +1,71 @@
+---
+title: "コマンドライン"
+description: "ターミナルやスクリプトから実行中のデスクトップアプリを操作します。"
+icon: "Terminal"
+---
+
+アプリ自体のプログラムもコマンドとして機能します: ターミナル、スクリプト、またはキーボードショートカットから実行中のコピーを制御します。
+
+```
+NuggetVPN status
+NuggetVPN connect Tokyo
+NuggetVPN disconnect
+```
+
+アプリは実行中でなければなりません（トレイに最小化可能）。アプリが実行されていない場合、コマンドはその旨を通知し、コード2で終了します。
+
+## コマンド [#commands]
+
+| コマンド | |
+| --- | --- |
+| `status` | VPNが起動中か、どのサーバーを通しているか、どのくらいの時間、トラフィック情報。 |
+| `connect [server]` | サーバーに接続します。ID、正確な名前、または1つのサーバーにのみ一致する名前の一部で指定可能。指定なしの場合、最後に使用したサーバーに接続します。 |
+| `disconnect` | 切断します。 |
+| `servers [search]` | サーバーの一覧を表示します。現在のサーバーは`*`で表示され、オプションで名前に`search`を含むもののみ表示可能です。 |
+| `setup [name]` | ルーティング設定を一覧表示します。現在アクティブなものは`*`で表示され、名前で切り替えることも可能です。 |
+| `speedtest` | 現在のサーバーを通して速度テストを実行し、ダウンロード、アップロード、ピング、ジッターを表示します。 |
+| `help` | コマンドの一覧を表示します。 |
+
+任意のコマンドに`--json`を追加すると、テキストの代わりにJSON形式で出力され、スクリプト用に使用できます:
+
+```
+$ NuggetVPN status --json
+{"status":"connected","profile_id":"p-de","profile":"Frankfurt 1","since":1790000000000}
+```
+
+## 終了コード [#exit-codes]
+
+| コード | |
+| --- | --- |
+| 0 | 完了。 |
+| 1 | アプリは拒否しました：そのようなサーバーは存在しない、速度テストのために接続されていない、など。理由は表示されます。 |
+| 2 | アプリは実行されていません。 |
+
+## プログラムの場所 [#where-the-program-is]
+
+| システム | |
+| --- | --- |
+| Windows | `C:\Program Files\Rigby Foundation\NuggetVPN\NuggetVPN.exe`、またはインストールした場所 |
+| macOS | `/Applications/NuggetVPN.app/Contents/MacOS/NuggetVPN` |
+| Linux | .deb または .rpm からの `/usr/bin/NuggetVPN`、または AppImage 自体 |
+
+macOS では、エイリアスを使うと簡単です：
+
+```bash
+alias nuggetvpn=/Applications/NuggetVPN.app/Contents/MacOS/NuggetVPN
+```
+
+### Windows [#windows]
+
+NuggetVPN はウィンドウプログラムであり、Windows はそれらの終了を待ちません。
+`cmd` では、出力が表示される前にプロンプトが戻ります。PowerShell では、出力をパイプすると待機します：
+
+```powershell
+& "C:\Program Files\Rigby Foundation\NuggetVPN\NuggetVPN.exe" status | Write-Output
+```
+
+出力や終了コードを読むスクリプト、またはそれをリダイレクトするスクリプトは、通常通り動作します。
+
+## セキュリティ [#security]
+
+実行中のアプリは自分のユーザーフォルダ内のソケットで待ち受けており、すべてのコマンドには、あなたのアカウントだけが読めるファイルからのトークンが付与されます。同じコンピュータ上の他のアカウントは使用できません。

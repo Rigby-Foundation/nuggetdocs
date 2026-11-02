@@ -1,0 +1,41 @@
+---
+title: "Files and folders"
+description: "Find app data, logs, runtime configuration, and core data on desktop."
+---
+
+NuggetVPN uses the application identifier `org.rigbyfoundation.nuggetvpn` for its user data. Locations differ by operating system.
+
+## macOS
+
+| Data | Location |
+| --- | --- |
+| Profiles and settings | `~/Library/Application Support/org.rigbyfoundation.nuggetvpn` |
+| Logs | `~/Library/Logs/org.rigbyfoundation.nuggetvpn` |
+| Generated core configuration | `~/Library/Caches/org.rigbyfoundation.nuggetvpn/` |
+| Administrator-only core data | `/Library/Application Support/NuggetVPN/cores` |
+
+## Linux
+
+| Data | Location |
+| --- | --- |
+| Profiles and settings | `$XDG_DATA_HOME/org.rigbyfoundation.nuggetvpn` |
+| Logs | `$XDG_DATA_HOME/org.rigbyfoundation.nuggetvpn/logs` |
+| Generated core configuration | `$XDG_CACHE_HOME/org.rigbyfoundation.nuggetvpn` |
+| Administrator-only core data | `/var/lib/nuggetvpn/cores` |
+
+When XDG variables are unset, the usual user defaults are `~/.local/share` for data and `~/.cache` for cache.
+
+## Windows
+
+| Data | Location |
+| --- | --- |
+| Profiles and settings | `%APPDATA%\org.rigbyfoundation.nuggetvpn` |
+| Logs | `%LOCALAPPDATA%\org.rigbyfoundation.nuggetvpn\logs` |
+| Generated core configuration | `%LOCALAPPDATA%\org.rigbyfoundation.nuggetvpn\runtime` |
+| Administrator-only core data | `%ProgramData%\NuggetVPN\cores` |
+
+## Moving or inspecting data
+
+Prefer [backup and restore](/en/docs/guides/backups) over manually copying individual files. Generated core configuration can contain credentials; do not publish it with a bug report without reviewing it.
+
+For the executable path used by terminal commands, see the [CLI reference](/en/docs/reference/cli#where-the-program-is).

@@ -1,0 +1,73 @@
+---
+title: "故障排除"
+description: "解决安装、导入、连接和路由问题。"
+icon: "Wrench"
+---
+
+## 从一个小检查开始 [#start-with-a-small-check]
+
+1. 确认你的正常互联网连接可用。
+2. 确认你的服务提供商订阅处于活动状态并刷新它。
+3. 尝试从同一来源的不同服务器。
+4. 检查 **设置 → 核心** 与[兼容性表](/zh/docs/reference/cores)。
+5. 打开[日志记录](/zh/docs/guides/monitoring#logs)，重现错误，并阅读失败信息。
+
+## macOS说应用程序已损坏 [#macos-says-the-app-is-damaged]
+
+macOS 版本是临时签名的，而不是使用 Apple 开发者证书签名的，因此 Gatekeeper 可能会阻止下载的应用程序。
+
+对于您信任的官方版本，请从已安装的应用程序中移除隔离属性：
+
+```bash
+xattr -cr /Applications/NuggetVPN.app
+```
+
+再次打开应用程序。此命令假设您将其放置在 `/Applications`。
+
+## 桌面权限提示失败 [#the-desktop-permission-prompt-fails]
+
+创建 TUN 界面需要管理员权限。在首次连接应用会话时批准系统提示。在 Linux 上，检查 polkit 和 `pkexec` 是否可用。
+
+以普通用户身份启动图形应用程序。它会启动自己的特权服务；图形界面不需要以 root 身份运行。
+
+## 订阅将不会导入 [#a-subscription-will-not-import]
+
+请检查您粘贴的是订阅端点，而不是提供商的账户或支付页面。响应需要包含以支持格式提供的服务器数据。
+
+如果提供商限制客户端身份或设备ID，请查看 **设置 → 订阅身份** 以及提供商的说明。在寻求帮助时不要公开订阅URL：它可能允许访问您账户的服务器。
+
+## 服务器提示需要另一个核心 [#a-server-says-it-needs-another-core]
+
+使用[核心兼容性](/zh/docs/reference/cores)。XHTTP需要内置核心或Xray；Xray无法运行Hysteria、Hysteria2、TUIC或SSH。`rigby://`配置文件无法连接任何嵌入核心。
+
+## 已连接，但网站无法加载 [#connected-but-websites-do-not-load]
+
+检查 **路由 → 其他所有流量** 和规则顺序。匹配的阻止规则可以阻止请求，而直接规则可以绕过隧道。查看 **网络连接** 以查看使用的规则和服务器。
+
+接下来，在 **设置 → 首页** 下检查 DNS 以及分配给域规则的任何 DNS。如果大文件传输停滞，请尝试较低的 MTU 并比较相同的传输。
+
+## 连接断开后交通被阻塞 [#traffic-is-blocked-after-a-connection-drops]
+
+如果启用了紧急关闭开关，在意外中断期间出现阻塞是预期的。重新连接以恢复隧道，或按 **断开连接** 以有意解除阻塞。请参阅 [紧急关闭开关行为](/zh/docs/guides/connection#kill-switch)。
+
+## 路由规则没有效果 [#a-routing-rule-has-no-effect]
+
+空规则匹配不到任何内容。你上方的更宽泛规则可能会先匹配。打开 **顺序** ，检查序列，然后生成一个新的连接并在 **网络连接** 中检查它。
+
+使用 mihomo 时，检测到的协议规则和 sing-box 格式规则列表将被跳过。已删除的特定服务器目的地会回退到已连接的服务器。
+
+## iOS 安装成功但从未连接 [#ios-installs-but-never-connects]
+
+检查签名证书。未签名的 IPA 需要网络扩展和数据包隧道功能。使用免费 Apple ID 签名无法提供所需的权限。请参见 [iOS 设置](/zh/docs/getting-started/mobile#ios)。
+
+## Wi-Fi 名称已隐藏 [#wi-fi-name-is-hidden]
+
+操作系统可能需要定位权限才能显示 SSID。请检查系统的隐私设置或手动在 **设置 → Wi-Fi** 中添加受信任的网络名称。
+
+## 日志中没有内容 [#there-is-nothing-in-logs]
+
+在发布版本中，日志功能默认关闭。可在 **日志** 或 **设置 → 隐私** 中启用，重现问题后检查输出。关闭日志会删除已保存的日志。
+
+## 报告可重现的问题 [#report-a-reproducible-issue]
+
+使用 [GitHub问题](https://github.com/Rigby-Foundation/NuggetVPN/issues)。请包含您的操作系统、应用版本、所选核心、协议和传输方式、重现步骤以及相关错误。分享凭据或连接详情前请先查看日志和配置摘录。

@@ -1,0 +1,41 @@
+---
+title: "ファイルとフォルダー"
+description: "デスクトップ上でアプリデータ、ログ、ランタイム設定、コアデータを見つけます。"
+---
+
+NuggetVPN はユーザーデータにアプリケーション識別子 `org.rigbyfoundation.nuggetvpn` を使用します。場所はオペレーティングシステムによって異なります。
+
+## macOS [#macos]
+
+| データ | 場所 |
+| --- | --- |
+| プロファイルと設定 | `~/Library/Application Support/org.rigbyfoundation.nuggetvpn` |
+| ログ | `~/Library/Logs/org.rigbyfoundation.nuggetvpn` |
+| 生成されたコア構成 | `~/Library/Caches/org.rigbyfoundation.nuggetvpn/` |
+| 管理者専用コアデータ | `/Library/Application Support/NuggetVPN/cores` |
+
+## Linux [#linux]
+
+| データ | 場所 |
+| --- | --- |
+| プロファイルと設定 | `$XDG_DATA_HOME/org.rigbyfoundation.nuggetvpn` |
+| ログ | `$XDG_DATA_HOME/org.rigbyfoundation.nuggetvpn/logs` |
+| 生成されたコア構成 | `$XDG_CACHE_HOME/org.rigbyfoundation.nuggetvpn` |
+| 管理者専用コアデータ | `/var/lib/nuggetvpn/cores` |
+
+XDG変数が未設定の場合、通常のユーザーのデフォルトはデータには`~/.local/share`、キャッシュには`~/.cache`です。
+
+## Windows [#windows]
+
+| データ | 場所 |
+| --- | --- |
+| プロファイルと設定 | `%APPDATA%\org.rigbyfoundation.nuggetvpn` |
+| ログ | `%LOCALAPPDATA%\org.rigbyfoundation.nuggetvpn\logs` |
+| 生成されたコア構成 | `%LOCALAPPDATA%\org.rigbyfoundation.nuggetvpn\runtime` |
+| 管理者専用コアデータ | `%ProgramData%\NuggetVPN\cores` |
+
+## データの移動または確認 [#moving-or-inspecting-data]
+
+個々のファイルを手動でコピーするよりも、[バックアップと復元](/ja/docs/guides/backups)を優先してください。生成されたコア構成には認証情報が含まれる場合があります。レビューせずにバグ報告とともに公開しないでください。
+
+ターミナルコマンドで使用される実行可能パスについては、[CLIリファレンス](/ja/docs/reference/cli#where-the-program-is)を参照してください。

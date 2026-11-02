@@ -1,0 +1,93 @@
+---
+title: "ساخت از کد منبع"
+description: "Wails را راه‌اندازی کنید، هسته‌های داخلی را بسازید و مشتری را بسته‌بندی کنید."
+---
+
+NuggetVPN از Go، Wails نسخه 3، و React 19 استفاده می‌کند. هر زمان اجرای پراکسی به عنوان یک کتابخانه Go به برنامه لینک شده است.
+
+## پیش‌نیازها [#prerequisites]
+
+- Go نسخه 1.26 یا جدیدتر.
+- Bun یا Node.js برای رابط کاربری.
+- Wails CLI نسخه 3.0.0. CLI، ماژول Go و `@wailsio/runtime` را همزمان نگه دارید.
+- ابزارهای ساخت پلتفرم که در زیر فهرست شده‌اند.
+
+```bash
+go install github.com/wailsapp/wails/v3/cmd/wails3@v3.0.0
+```
+
+| پلتفرم | ابزارهای ساخت |
+| --- | --- |
+| macOS | ابزارهای خط فرمان Xcode: `xcode-select --install`. |
+| Linux | زنجیره ابزار C، `libgtk-4-dev`، و `libwebkitgtk-6.0-dev`. `pkexec` در زمان اجرا لازم است. |
+| Windows | WebView2 و NSIS برای بسته‌بندی نصب‌کننده. |
+
+## کلون و اجرا [#clone-and-run]
+
+```bash
+git clone https://github.com/Rigby-Foundation/NuggetVPN.git
+cd NuggetVPN
+make dev
+```
+
+## ساخت و اعتبارسنجی [#build-and-validate]
+
+```bash
+make build
+make test
+make vet
+```
+
+`make build` به `bin/` می‌نویسد. برای بررسی رابط کاربری مستقل:
+
+```bash
+cd frontend
+bun run build
+```
+
+## برچسب‌های ساخت لازم هستند [#build-tags-are-required]
+
+از دستورهای Make و وظایف Wails مخزن استفاده کنید. `Taskfile.yml` `SING_BOX_TAGS` را تعریف می‌کند، و `buildtags.go` برچسب‌های لازم مفقود را به خطای کامپایل تبدیل می‌کند.
+
+| برچسب | ویژگی |
+| --- | --- |
+| `with_utls` | Reality. |
+| `with_quic` | Hysteria، Hysteria2، و TUIC. |
+| `with_wireguard` | WireGuard. |
+| `with_clash_api` | حسابداری ترافیک در حال پردازش؛ هیچ کنترل‌کننده HTTP باز نیست. |
+| `with_gvisor` | پشته gVisor قدیمی برای پیکربندی‌های دست‌نویس که آن را درخواست می‌کنند. |
+
+برای یک ساخت دستی Go، برچسب‌ها را از Make دریافت کنید:
+
+```bash
+go build -tags "$(make -s tags)" .
+```
+
+## بسته‌های دسکتاپ [#desktop-packages]
+
+| فرمان | خروجی |
+| --- | --- |
+| `make dmg` | `bin/NuggetVPN.dmg` |
+| `make dmg-universal` | DMG یونیورسال arm64 + amd64. |
+| `make linux-packages` | DEB، RPM و AppImage در `bin/`. |
+| `make package` روی Windows | اجرایی و نصب‌کننده NSIS. |
+
+## ساخت‌های Android [#android-builds]
+
+`ANDROID_NDK_HOME` را برای NDK تنظیم کنید. ساخت‌های APK همچنین به JDK 17 و Android SDK از طریق `ANDROID_HOME` نیاز دارند.
+
+```bash
+wails3 task android:apk
+wails3 task android:package
+wails3 task android:run:device
+```
+
+این‌ها به ترتیب یک APK دیباگ arm64، APKهای ریلیز arm64 و x86_64، و یک بیلد دیباگ روی دستگاه متصل می‌سازند. امضای ریلیز از طریق اسرار `ANDROID_KEYSTORE_*` در جریان کاری ریلیز پیکربندی شده است.
+
+## مشارکت در تغییرات [#contributing-changes]
+
+تماس‌های فرانت‌اند از طریق `frontend/src/lib/backend.ts` به متدهای صادر شده تحت `internal/app/` می‌روند. هنگام اضافه کردن یک متد بک‌اند، یک ورودی به جدول فرمان پل اضافه کنید؛ `bridge_test.go` بررسی می‌کند که دو سمت موافق باشند.
+
+برای تغییرات در پیکربندی‌های تولید شده، `internal/sbconfig/build_test.go` را گسترش دهید. آن تست‌ها پیکربندی را از طریق پارسر واقعی گزینه‌های هسته گرفته و خروجی Reality را تولید می‌کنند. پروتکل‌های تغییر یافته را نیز در مقابل یک سرور واقعی بررسی کنید.
+
+کلاینت تحت مجوز [GPL-3.0](https://github.com/Rigby-Foundation/NuggetVPN/blob/main/LICENSE) است. راهنمای مشارکت [مخزن](https://github.com/Rigby-Foundation/NuggetVPN/blob/main/CONTRIBUTING.md) را ببینید.

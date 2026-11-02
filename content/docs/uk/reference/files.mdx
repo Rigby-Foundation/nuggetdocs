@@ -1,0 +1,41 @@
+---
+title: "Файли та теки"
+description: "Знайдіть дані додатка, журнали, конфігурацію під час виконання та дані ядра на робочому столі."
+---
+
+NuggetVPN використовує ідентифікатор додатка `org.rigbyfoundation.nuggetvpn` для своїх користувацьких даних. Місця розташування відрізняються залежно від операційної системи.
+
+## macOS [#macos]
+
+| Дані | Розташування |
+| --- | --- |
+| Профілі та налаштування | `~/Library/Application Support/org.rigbyfoundation.nuggetvpn` |
+| Журнали | `~/Library/Logs/org.rigbyfoundation.nuggetvpn` |
+| Згенерована базова конфігурація | `~/Library/Caches/org.rigbyfoundation.nuggetvpn/` |
+| Дані ядра лише для адміністратора | `/Library/Application Support/NuggetVPN/cores` |
+
+## Linux [#linux]
+
+| Дані | Розташування |
+| --- | --- |
+| Профілі та налаштування | `$XDG_DATA_HOME/org.rigbyfoundation.nuggetvpn` |
+| Журнали | `$XDG_DATA_HOME/org.rigbyfoundation.nuggetvpn/logs` |
+| Згенерована базова конфігурація | `$XDG_CACHE_HOME/org.rigbyfoundation.nuggetvpn` |
+| Дані ядра лише для адміністратора | `/var/lib/nuggetvpn/cores` |
+
+Коли змінні XDG не встановлені, типовими значеннями для користувача є `~/.local/share` для даних і `~/.cache` для кешу.
+
+## Windows [#windows]
+
+| Дані | Розташування |
+| --- | --- |
+| Профілі та налаштування | `%APPDATA%\org.rigbyfoundation.nuggetvpn` |
+| Журнали | `%LOCALAPPDATA%\org.rigbyfoundation.nuggetvpn\logs` |
+| Згенерована базова конфігурація | `%LOCALAPPDATA%\org.rigbyfoundation.nuggetvpn\runtime` |
+| Дані ядра лише для адміністратора | `%ProgramData%\NuggetVPN\cores` |
+
+## Переміщення або перевірка даних [#moving-or-inspecting-data]
+
+Віддавайте перевагу [резервному копіюванню та відновленню](/uk/docs/guides/backups) замість ручного копіювання окремих файлів. Згенерована базова конфігурація може містити облікові дані; не публікуйте її у звіті про помилку без попереднього перегляду.
+
+Для шляху виконуваного файлу, який використовується командами терміналу, див. [CLI reference](/uk/docs/reference/cli#where-the-program-is).

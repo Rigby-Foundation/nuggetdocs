@@ -1,0 +1,41 @@
+---
+title: "Android and iOS"
+description: "Install mobile builds and understand what differs from desktop."
+---
+
+## Android
+
+Download the APK for your device from [Releases](https://github.com/Rigby-Foundation/NuggetVPN/releases). Android may ask you to allow installation from the app used to open the APK.
+
+1. Install and open NuggetVPN.
+2. Add a subscription or server using the [quick start](/en/docs/getting-started/first-connection).
+3. Connect and approve Android’s VPN permission prompt.
+
+Android’s **VpnService** provides the tunnel. The app runs the core inside the application instead of starting a desktop administrator service.
+
+### Available on Android
+
+- The built-in core and Xray.
+- Subscription and server imports, including QR camera scanning.
+- Routing, themes, fonts, and routing content from plugins.
+- Material You wallpaper colours for the **System** theme on Android 12 and newer.
+
+### Desktop features not available on Android
+
+Official sing-box and mihomo are not available. Wi-Fi rules, launch at login, the global shortcut, the system tray, the command line, and in-app updates are also unavailable. Install a newer APK to update.
+
+Plugin pages do not run on Android. The WebView’s native bridge cannot be isolated from those frames, so only content contributions are enabled.
+
+## iOS
+
+NuggetVPN is not distributed through the App Store. Releases provide an unsigned asset ending in `-ios-unsigned.ipa` for iOS 15 and newer.
+
+<Callout type="warn" title="VPN entitlements are required">
+Sign the IPA with your own certificate using a signing app or a supported installation method such as TrollStore. The signing certificate must permit Network Extensions and a packet tunnel. A free Apple ID certificate does not provide those capabilities: the app can install but will not connect.
+</Callout>
+
+After installing a correctly signed build, import your provider’s configuration and accept the system VPN prompt when connecting. Follow the capabilities of your installed iOS build; desktop-only controls and the Android feature list should not be assumed to apply to iOS.
+
+## Moving your configuration
+
+A provider subscription can be imported on each device. Treat its URL as a credential. For backup and restore behaviour, see [backups](/en/docs/guides/backups).

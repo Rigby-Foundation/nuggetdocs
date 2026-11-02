@@ -1,0 +1,44 @@
+---
+title: "Profiles and subscriptions"
+description: "Add connection sources, refresh servers, and understand provider information."
+---
+
+A **profile** describes a connection. A **subscription** is a URL that supplies a collection of servers and can be refreshed when the provider changes them.
+
+## Add a source
+
+Open **Profiles & subscriptions → Add** and paste your connection information.
+
+| Input | What happens |
+| --- | --- |
+| HTTP or HTTPS subscription URL | Downloads the provider’s subscription. |
+| Protocol share link | Creates an individual profile. |
+| sing-box JSON | Imports a configuration. |
+| Clash configuration | Accepted by the configuration parser; use mihomo when you need to run a complete Clash configuration as supplied. |
+| QR image | Decodes the content into the add dialog for review. |
+
+The add dialog advertises subscription URLs, server links, and sing-box JSON. If a format or protocol fails, compare it with the [protocol reference](/en/docs/reference/protocols) and [core limits](/en/docs/reference/cores).
+
+## Refresh a subscription
+
+Use the refresh control on its card in **Profiles & subscriptions**. This retrieves the current server list from the original provider URL.
+
+Under **Settings → Behaviour**, **Update subscriptions automatically** enables refresh at startup and on a six-hour schedule. A provider can also suggest a refresh interval for you to accept. Turning automatic subscription updates off disables automatic refresh for every subscription; manual refresh remains available.
+
+## Usage, expiry, and provider messages
+
+NuggetVPN shows subscription data allowance, consumption, and expiry only when the provider includes them in its response. Missing values do not establish that the subscription has unlimited data or no expiry.
+
+Providers can also supply a title, branding, and announcements. These describe the subscription; they are distinct from the app’s locally measured traffic counters.
+
+## Subscription identity
+
+Some providers restrict which clients or devices may retrieve a subscription. **Settings → Subscription identity** controls the client identity and device ID used for these requests. If an otherwise valid subscription is refused, check your provider’s requirements before changing these values.
+
+## Share, export, and delete
+
+Source and proxy controls offer sharing and export. The source list also supports selecting several entries for refresh, copy, export, or deletion.
+
+A subscription URL, server link, QR code, or exported configuration can contain credentials. Share only with people who should be able to use that connection.
+
+Removing a source removes it from this installation. To preserve your complete configuration first, [save a backup](/en/docs/guides/backups).

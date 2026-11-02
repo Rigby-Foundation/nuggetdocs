@@ -1,0 +1,61 @@
+---
+title: "Architecture"
+description: "How the user interface, privileged service, and embedded cores fit together."
+---
+
+## One binary, two desktop modes
+
+```text
+NuggetVPN                  GUI, running as the user
+NuggetVPN --core-service   Privileged tunnel service
+```
+
+The GUI starts another copy of itself through the platform’s authorisation flow: `osascript` on macOS, `pkexec` on Linux, or UAC on Windows. Both sides therefore use the same app version.
+
+```text
+React + Wails UI  ←→  Authenticated socket  ←→  Core service
+    user                  JSON lines              admin
+                                              TUN, DNS, routing
+                                              embedded engines
+```
+
+The privileged service calls core libraries in-process. Logs, connection state, byte counters, and the live connection list return over the same socket. Quitting the GUI shuts the service down; the service also watches the GUI process so that a crash does not leave the service holding the routing table.
+
+## Socket authentication
+
+Every service connection must first present a 256-bit per-session token. The GUI writes it to a `0600` file, the elevated process reads and deletes the file, and unauthenticated connections are closed without exposing state.
+
+Passing the token through a file avoids publishing it in a world-readable command line on Linux. Explicit authentication also covers platforms where Unix socket chmod and chown do not enforce the expected access boundary.
+
+## Embedded engines
+
+The built-in TodayCore fork keeps sing-box’s module path using a Go `replace` directive. Official sing-box and sing-tun are vendored under separate module paths in `third_party/` so that both implementations can coexist.
+
+mihomo handles complete Clash configurations. Xray runs the server side of the connection behind the built-in core, which retains TUN, DNS, and routing. A protected loopback entry point carries Xray’s transport directly out to avoid self-routing.
+
+No core HTTP controller is started. Traffic accounting and connection inspection are read in-process, and controller options from imported Clash configurations are removed.
+
+## Source map
+
+| Path | Responsibility |
+| --- | --- |
+| `main.go` | Entry point, GUI/service dispatch, window, and tray. |
+| `internal/app/` | Services exposed to the frontend. |
+| `internal/core/` | Privileged service, IPC client, and in-process runtimes. |
+| `internal/sbconfig/` | Profile and settings to sing-box configuration; routing compilation. |
+| `internal/cores/` | mihomo and Xray configuration translation. |
+| `internal/link/` | Share link, sing-box JSON, and Clash YAML parsing. |
+| `internal/remote/` | Subscriptions and optional profile synchronisation. |
+| `internal/probe/` | Latency and connectivity checks. |
+| `internal/stats/`, `internal/speedtest/` | Stored measurements and speed tests. |
+| `internal/plugins/` | Plugin packaging, validation, serving, and sandbox policy. |
+| `internal/cli/` | Desktop command line and control socket. |
+| `internal/storage/`, `internal/models/` | Persistence and shared types. |
+| `frontend/` | React app, backend bridge, and translations. |
+| `Taskfile.yml`, `build/` | Build and packaging tasks. |
+
+## Android boundary
+
+Android’s VpnService supplies the tunnel rather than a privileged desktop process. `internal/android` passes the interface to sing-box, keeps core sockets outside the VPN, and reports the current network. A small Java host loads the Go shared library into the WebView app.
+
+See [building](/en/docs/developers/building) to run the project and [plugin security](/en/docs/plugins/security) for the extension boundary.

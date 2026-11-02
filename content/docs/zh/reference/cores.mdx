@@ -1,0 +1,34 @@
+---
+title: "内核兼容性"
+description: "选择适合您的服务器和路由的嵌入式引擎。"
+icon: "Cpu"
+---
+
+在 **设置 → 核心** 下选择一个核心。桌面版本在同一个二进制文件中嵌入了四个核心，因此无需单独安装核心可执行文件。应用程序会在每个选项旁显示嵌入的版本。
+
+从 **内置 sing-box** 开始，以获得对应用功能的最广泛支持。
+
+## 比较核心 [#compare-cores]
+
+| 核心 | 使用场景 | 限制 |
+| --- | --- | --- |
+| **内置 sing-box** | 默认的基于TodayCore的引擎，包括XHTTP、Reality以及应用的完整路由功能集。 | 嵌入核心不支持`rigby://`。 |
+| **官方 sing-box** | SagerNet的sing-box实现。 | 无XHTTP；那些服务器需要内置或Xray。 |
+| **mihomo** | ClashMeta和完整的Clash配置。 | 跳过检测到的协议规则和sing-box`.srs`/`.json`规则列表。使用自己的地理数据。应用的TLS分块和SNI设置不适用。 |
+| **Xray** | Xray服务器处理与内置隧道、DNS和路由。 | 不支持 Hysteria、Hysteria2、TUIC 和 SSH 服务器，也不支持 Shadowsocks 插件。应用中的 TLS 分片和 SNI 设置不生效。 |
+
+## Android [#android]
+
+在 Android 上只提供内置核心和 Xray。内置核心与 Android 的 VpnService 集成，Xray 在其后工作。
+
+## 不受支持的配置文件 [#unsupported-profiles]
+
+应用程序会询问所选核心哪些配置文件无法运行。那些配置文件会带有原因标记，而不是看起来可用但是无缘无故失败。
+
+如果服务器被标记为 **需要其他内核** ，请将其协议和传输方式与此表进行对比，切换核心，然后重新尝试。
+
+## Xray 的适用方式 [#how-xray-fits-in]
+
+Xray 处理出站服务器连接，而内置核心维护 TUN、DNS、路由和紧急关闭开关。受密码保护的回环入口点将 Xray 自己的传输直接发送出去，避免将其路由回自身。
+
+实现细节请参阅[架构](/zh/docs/developers/architecture)。支持的链接和传输类型请参阅[协议](/zh/docs/reference/protocols)。

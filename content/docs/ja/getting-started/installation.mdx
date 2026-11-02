@@ -1,0 +1,66 @@
+---
+title: "NuggetVPN のインストール"
+description: "デスクトップインストーラーを選び、リリースをダウンロードしてアプリを起動する。"
+---
+
+[公式GitHubリリース](https://github.com/Rigby-Foundation/NuggetVPN/releases)からビルドをダウンロードする。使用するOSおよびプロセッサ用のパッケージを使用する。
+
+## デスクトップインストール [#desktop-installation]
+
+<Tabs items={['Windows', 'macOS', 'Linux']}>
+<Tab value="Windows">
+ReleasesからNSISインストーラーをダウンロードして実行する。Windowsはアプリを表示するためにWebView2を使用する。
+
+自動インストールの場合、PowerShellで次のコマンドを実行する:
+
+```powershell
+irm https://raw.githubusercontent.com/Rigby-Foundation/NuggetVPN/main/scripts/install.ps1 | iex
+```
+
+スクリプトは最新のリリースをダウンロードし、GitHubによって公開されたSHA-256ダイジェストを確認し、インストールしてアプリを起動する。再度実行するとインストールが更新される。
+
+無人インストールの場合は、`-silent-installer.exe`で終わるリリースアセットを使用するか、通常のインストーラーに`/S`を渡してください。
+</Tab>
+<Tab value="macOS">
+リリースから`.dmg`をダウンロードし、 **NuggetVPN** を **アプリケーション** に移動します。Macの場合はApple siliconまたはIntelを選択するか、提供されていればユニバーサルビルドを選びます。
+
+インストーラースクリプトも使用できます：
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/Rigby-Foundation/NuggetVPN/main/scripts/install.sh | sh
+```
+
+このスクリプトは、インストールおよび起動前にリリースをダウンロードして確認します。再度実行するとアプリを更新します。
+
+macOSがアプリが壊れていると表示した場合は、[Gatekeeperトラブルシューティング](/ja/docs/troubleshooting#macos-says-the-app-is-damaged)を参照してください。
+</Tab>
+<Tab value="Linux">
+リリースから`.deb`、`.rpm`、または`.AppImage`を選択してください。アプリは実行時にGTK 4とWebKitGTK 6が必要であり、さらにデスクトップ昇格にはpolkitの`pkexec`が必要です。
+
+インストーラスクリプトは、apt、dnf、または zypper が利用可能なときは `.deb` または `.rpm` を選択し、そうでない場合は AppImage を選択します:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/Rigby-Foundation/NuggetVPN/main/scripts/install.sh | sh
+```
+
+リリースダイジェストを確認し、アプリをインストールして起動します。再度実行するとインストールが更新されます。
+
+手動でダウンロードした AppImage の場合、開く前に実行可能にしてください:
+
+```bash
+chmod +x ./NuggetVPN*.AppImage
+```
+</Tab>
+</Tabs>
+
+## 初回起動 [#first-launch]
+
+通常のユーザーとしてアプリを開きます。デスクトップでは、各アプリセッションの最初の接続時に、TUN ネットワークインターフェイスを作成するための管理者アクセスを求めるプロンプトが表示されます。グラフィカルインターフェイスはユーザーとして実行され続け、トンネルは別の特権サービスで実行されます。
+
+アプリにはサーバー構成が必要です。[最初の接続](/ja/docs/getting-started/first-connection)を続けてください。
+
+## 更新 [#updates]
+
+デスクトップ版ビルドは、アプリ内で更新を確認してインストールすることができます。また、インストーラスクリプトを再実行したり、新しいリリースを手動でインストールすることも可能です。別のマシンにインストールを移動する前に、[バックアップ](/ja/docs/guides/backups)を保存してください。
+
+Android APK と署名されていない iOS IPA の場合は、[モバイルガイド](/ja/docs/getting-started/mobile)に従ってください。

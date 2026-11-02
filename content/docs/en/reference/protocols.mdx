@@ -1,0 +1,32 @@
+---
+title: "Protocols and configuration formats"
+description: "Supported server families, transports, and import formats."
+---
+
+Protocol support depends on the [selected core](/en/docs/reference/cores). Use the built-in core as the compatibility baseline.
+
+## Server protocols
+
+The client supports VLESS, VMess, Trojan, Shadowsocks, Hysteria, Hysteria2, TUIC, WireGuard, SOCKS, HTTP, and SSH.
+
+VLESS supports Reality with XTLS Vision. The built-in TodayCore implementation also includes Reality with the `X25519MLKEM768` key share and VLESS post-quantum encryption.
+
+## Transports
+
+Supported transport families include TCP, WebSocket, gRPC, HTTP/2, HTTPUpgrade, and XHTTP. A transport must be supported by both the selected core and the server configuration.
+
+- **XHTTP:** use the built-in core or Xray.
+- **Hysteria, Hysteria2, TUIC, SSH:** use a core other than Xray.
+- **Shadowsocks plugins:** not available through Xray.
+
+## Import formats
+
+The parser accepts common protocol share links, subscriptions, full sing-box JSON, and Clash configurations. For complete Clash configurations, mihomo preserves the intended Clash runtime behaviour.
+
+The add dialog can decode QR images. `nuggetvpn://` deep links and supported connection links copied to the clipboard can also be offered for import.
+
+See [profiles and subscriptions](/en/docs/guides/profiles) for the import workflow.
+
+## Unsupported rigby profiles
+
+`rigby://` profiles can appear in the list, but do not connect. That protocol exists in a clash-rs fork and is not implemented by the embedded cores. Obtain a supported connection format from the provider.

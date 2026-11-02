@@ -1,0 +1,93 @@
+---
+title: "Сборка из исходного кода"
+description: "Настройте Wails, соберите встроенные ядра и упакуйте клиент."
+---
+
+NuggetVPN использует Go, Wails v3 и React 19. Каждый прокси-рантайм подключается к приложению как Go библиотека.
+
+## Предварительные требования [#prerequisites]
+
+- Go 1.26 или новее.
+- Bun или Node.js для фронтенда.
+- Wails CLI v3.0.0. Держите CLI, Go модуль и `@wailsio/runtime` согласованными.
+- Ниже перечислены инструменты сборки платформы.
+
+```bash
+go install github.com/wailsapp/wails/v3/cmd/wails3@v3.0.0
+```
+
+| Платформа | Инструменты сборки |
+| --- | --- |
+| macOS | Xcode Командные инструменты: `xcode-select --install`. |
+| Linux | Библиотека С, `libgtk-4-dev` и `libwebkitgtk-6.0-dev`. `pkexec` требуется во время выполнения. |
+| Windows | WebView2 и NSIS для упаковки установщика. |
+
+## Клонируйте и запустите [#clone-and-run]
+
+```bash
+git clone https://github.com/Rigby-Foundation/NuggetVPN.git
+cd NuggetVPN
+make dev
+```
+
+## Соберите и проверьте [#build-and-validate]
+
+```bash
+make build
+make test
+make vet
+```
+
+`make build` записывает в `bin/`. Для проверки автономного интерфейса:
+
+```bash
+cd frontend
+bun run build
+```
+
+## Требуются теги сборки [#build-tags-are-required]
+
+Используйте Make и задачи Wails из репозитория. `Taskfile.yml` определяет `SING_BOX_TAGS`, а `buildtags.go` делает отсутствие необходимых тегов ошибкой компиляции.
+
+| Тег | Функция |
+| --- | --- |
+| `with_utls` | Reality. |
+| `with_quic` | Hysteria, Hysteria2 и TUIC. |
+| `with_wireguard` | WireGuard. |
+| `with_clash_api` | Учет трафика в процессе; контроллер HTTP не открыт. |
+| `with_gvisor` | Устаревший стек gVisor для настроек, создаваемых вручную, которые это требуют. |
+
+Для ручной сборки Go получите теги с помощью Make:
+
+```bash
+go build -tags "$(make -s tags)" .
+```
+
+## Пакеты для настольных компьютеров [#desktop-packages]
+
+| Команда | Вывод |
+| --- | --- |
+| `make dmg` | `bin/NuggetVPN.dmg` |
+| `make dmg-universal` | Универсальный DMG для arm64 + amd64. |
+| `make linux-packages` | DEB, RPM и AppImage в `bin/`. |
+| `make package` на Windows | Исполняемый файл и установщик NSIS. |
+
+## Android сборки [#android-builds]
+
+Установите `ANDROID_NDK_HOME` для NDK. Для сборки APK также требуется JDK 17 и Android SDK через `ANDROID_HOME`.
+
+```bash
+wails3 task android:apk
+wails3 task android:package
+wails3 task android:run:device
+```
+
+Эти команды собирают отладочный APK для arm64, релизные APK для arm64 и x86_64, а также отладочную сборку на подключенном устройстве соответственно. Подпись релизов настраивается через секреты `ANDROID_KEYSTORE_*` в рабочем процессе релиза.
+
+## Внесение изменений [#contributing-changes]
+
+Вызовы фронтенда проходят через `frontend/src/lib/backend.ts` к экспортированным методам под `internal/app/`. Добавьте запись в таблицу команд моста при добавлении метода на бэкенде; `bridge_test.go` проверяет, что обе стороны согласованы.
+
+Для изменений сгенерированных конфигураций расширяйте `internal/sbconfig/build_test.go`. Эти тесты подают конфигурацию через настоящий парсер опций ядра и строят исходящие Reality. Также проверяйте измененные протоколы на настоящем сервере.
+
+Клиент лицензирован по [GPL-3.0](https://github.com/Rigby-Foundation/NuggetVPN/blob/main/LICENSE). См. [руководство по внесению вкладов](https://github.com/Rigby-Foundation/NuggetVPN/blob/main/CONTRIBUTING.md) в репозиторий.

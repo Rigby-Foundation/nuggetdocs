@@ -1,0 +1,78 @@
+---
+title: "主题、字体与路由"
+description: "无需代码或权限即可贡献内容。"
+---
+
+内容不需要代码和权限：一个插件可以仅仅由`plugin.json`和几个文件组成。
+
+## 主题 [#themes]
+
+主题使用与设置 → 外观中的主题编辑器相同的编号。找到你喜欢的值的最简单方法是先在那里构建主题，然后复制它的编号。
+
+```json
+"themes": [
+  {
+    "id": "storm",
+    "name": "Storm",
+    "mode": "dark",
+    "background": { "h": 250, "c": 0.03, "l": 0.14 },
+    "accent": { "h": 190, "c": 0.13 },
+    "image": {
+      "file": "images/storm.jpg",
+      "blur": 12,
+      "brightness": 0.9,
+      "saturate": 1,
+      "dim": 0.35,
+      "panel": 0.65
+    }
+  }
+]
+```
+
+| 字段 | |
+| --- | --- |
+| `id` | 插件内唯一，与插件ID的形式相同。 |
+| `name` | 最多60个字符，在主题选择器中显示。 |
+| `mode` | `"dark"` 或 `"light"`。 |
+| `background.h` | 页面色相，0–360。 |
+| `background.c` | 色调，0–0.08，0为灰色。 |
+| `background.l` | 亮度：暗色主题为0–0.3，浅色主题为0.9–1。 |
+| `accent.h` | 按钮、开关和高亮的色相，0–360。 |
+| `accent.c` | 点缀的鲜艳度，0–0.25。 |
+| `image` | 可选：应用程序背后的图片。 |
+| `image.file` | 插件中的 PNG、JPEG、WebP 或 GIF。 |
+| `image.blur` | 模糊程度（像素），0–40。 |
+| `image.brightness` | 0.3–1.5；1 表示保持原样。 |
+| `image.saturate` | 0–2；0 表示黑白。 |
+| `image.dim` | 主题背景颜色覆盖的程度，0–0.9。 |
+| `image.panel` | 应用程序面板在其上的不透明度，0.2（玻璃感）至 1（实心）。 |
+
+超出范围的数值会被限制在范围内，而不是被拒绝。颜色使用OKLCH，并且每种模式下高光的明暗度是固定的，因此按钮上的文字始终可读。
+
+## 字体 [#fonts]
+
+```json
+"fonts": [
+  { "name": "Weather Sans", "file": "fonts/weather-sans.woff2" }
+]
+```
+
+TTF、OTF、WOFF 或 WOFF2。每种字体都会在字体列表中以其名称显示，并为所有语言提供支持。缺失的字母会从备用字体中获取。
+
+检查字体的许可是否允许你重新分发。
+
+## 路由设置 [#routing-setups]
+
+```json
+"routing": [
+  {
+    "name": "Streaming direct",
+    "description": "Netflix, YouTube and Twitch outside the VPN.",
+    "file": "routing/streaming.vflow"
+  }
+]
+```
+
+`.vflow` 文件是完整的路由图，与 Routing → Export 保存的文件相同。在应用中构建设置，导出文件，然后将文件放入你的插件中。从 Routing → From plugins 使用文件会替换用户的路由；用户可以撤销该操作。
+
+指向特定服务器的设置在其他人的电脑上会失去这些链接，因为他们的服务器不同。将流量发送通过VPN、“直接”或“阻止”的规则在任何地方都能工作。

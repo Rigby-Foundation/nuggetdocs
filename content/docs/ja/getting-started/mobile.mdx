@@ -1,0 +1,41 @@
+---
+title: "Android と iOS"
+description: "モバイル版をインストールして、デスクトップ版と何が異なるかを理解する。"
+---
+
+## Android [#android]
+
+[Releases](https://github.com/Rigby-Foundation/NuggetVPN/releases)からあなたのデバイス用のAPKをダウンロードしてください。AndroidはAPKを開くために使用したアプリからのインストールを許可するように求める場合があります。
+
+1. NuggetVPN をインストールして開きます。
+2. [クイックスタート](/ja/docs/getting-started/first-connection)を使用して、サブスクリプションまたはサーバーを追加してください。
+3. 接続してAndroidのVPNの権限要求を承認してください。
+
+Androidの **VpnService** がトンネルを提供します。アプリはデスクトップ管理者サービスを起動する代わりに、アプリケーション内でコアを実行します。
+
+### Androidで利用可能 [#available-on-android]
+
+- 内蔵のコアとXray。
+- サブスクリプションおよびサーバーのインポート、QRカメラスキャンを含む。
+- ルーティング、テーマ、フォント、プラグインからのルーティングコンテンツ。
+- Material Youの壁紙の色、Android 12以降での **システムのテーマ** テーマ用。
+
+### Androidでは利用できないデスクトップ機能 [#desktop-features-not-available-on-android]
+
+公式のsing-boxおよびmihomoは利用できません。Wi-Fiルール、ログイン時の起動、グローバルショートカット、システムトレイ、コマンドライン、およびアプリ内アップデートも利用できません。アップデートするには、新しいAPKをインストールしてください。
+
+プラグインページは Android では実行されません。 WebView のネイティブブリッジはこれらのフレームから分離できないため、コンテンツの提供のみが有効です。
+
+## iOS [#ios]
+
+NuggetVPN はApp Storeを通じて配布されていません。リリースでは［iOS 15 以降用］の`-ios-unsigned.ipa` で終わる署名なしのアセットが提供されます。
+
+<Callout type="warn" title="VPN の権利が必要です">
+署名アプリや TrollStore などのサポートされているインストール方法を使用して、自分の証明書でIPAに署名してください。署名証明書は Network Extensions およびパケットトンネルを許可する必要があります。無料のApple ID証明書ではこれらの機能は提供されません：アプリはインストールできますが、接続はできません。
+</Callout>
+
+正しく署名されたビルドをインストールした後、プロバイダーの構成をインポートし、接続時に表示されるシステムVPNのプロンプトを承認してください。インストールされているiOSビルドの機能に従ってください。デスクトップ専用の操作やAndroidの機能リストがiOSに適用されるとは限りません。
+
+## 構成の移動 [#moving-your-configuration]
+
+プロバイダーのサブスクリプションは各デバイスにインポートできます。そのURLは認証情報として扱ってください。バックアップと復元の動作については、[backups](/ja/docs/guides/backups)を参照してください。

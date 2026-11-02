@@ -1,0 +1,41 @@
+---
+title: "文件与目录"
+description: "在桌面上查找应用数据、日志、运行时配置和核心数据。"
+---
+
+NuggetVPN 使用应用程序标识符 `org.rigbyfoundation.nuggetvpn` 来存储其用户数据。位置因操作系统而异。
+
+## macOS [#macos]
+
+| 数据 | 位置 |
+| --- | --- |
+| 配置文件和设置 | `~/Library/Application Support/org.rigbyfoundation.nuggetvpn` |
+| 日志 | `~/Library/Logs/org.rigbyfoundation.nuggetvpn` |
+| 生成的核心配置 | `~/Library/Caches/org.rigbyfoundation.nuggetvpn/` |
+| 仅限管理员的核心数据 | `/Library/Application Support/NuggetVPN/cores` |
+
+## Linux [#linux]
+
+| 数据 | 位置 |
+| --- | --- |
+| 配置文件和设置 | `$XDG_DATA_HOME/org.rigbyfoundation.nuggetvpn` |
+| 日志 | `$XDG_DATA_HOME/org.rigbyfoundation.nuggetvpn/logs` |
+| 生成的核心配置 | `$XDG_CACHE_HOME/org.rigbyfoundation.nuggetvpn` |
+| 仅限管理员的核心数据 | `/var/lib/nuggetvpn/cores` |
+
+当 XDG 变量未设置时，数据的通常用户默认值为 `~/.local/share`，缓存为 `~/.cache`。
+
+## Windows [#windows]
+
+| 数据 | 位置 |
+| --- | --- |
+| 配置文件和设置 | `%APPDATA%\org.rigbyfoundation.nuggetvpn` |
+| 日志 | `%LOCALAPPDATA%\org.rigbyfoundation.nuggetvpn\logs` |
+| 生成的核心配置 | `%LOCALAPPDATA%\org.rigbyfoundation.nuggetvpn\runtime` |
+| 仅限管理员的核心数据 | `%ProgramData%\NuggetVPN\cores` |
+
+## 移动或检查数据 [#moving-or-inspecting-data]
+
+相比手动复制单个文件，优先使用 [备份和恢复](/zh/docs/guides/backups)。生成的核心配置可能包含凭证；在提交错误报告之前，请勿未经检查发布。
+
+有关终端命令使用的可执行路径，请参阅 [CLI 参考](/zh/docs/reference/cli#where-the-program-is)。

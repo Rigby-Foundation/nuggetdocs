@@ -1,0 +1,70 @@
+---
+title: "命令行"
+description: "可以从终端或脚本控制正在运行的桌面应用程序。"
+icon: "Terminal"
+---
+
+应用程序自身的程序也可以作为命令使用：它可以从终端、脚本或键盘快捷键控制正在运行的副本。
+
+```
+NuggetVPN status
+NuggetVPN connect Tokyo
+NuggetVPN disconnect
+```
+
+应用程序必须正在运行（可以最小化到托盘）。如果没有应用程序运行，命令会提示并以代码 2 退出。
+
+## 命令 [#commands]
+
+| 命令 | |
+| --- | --- |
+| `status` | VPN 是否运行，通过哪个服务器，运行多久，以及流量。 |
+| `connect [server]` | 连接。通过其ID、精确名称或仅匹配一个服务器的名称部分与服务器连接。如果不提供，则连接到上次使用的服务器。 |
+| `disconnect` | 断开连接。 |
+| `servers [search]` | 列出服务器，当前服务器标记为`*`，可选择只显示名称包含`search`的服务器。 |
+| `setup [name]` | 列出路由设置，活动的标记为`*`，或者按名称切换到某个设置。 |
+| `speedtest` | 通过当前服务器运行速度测试，并显示下载、上传、延迟和抖动。 |
+| `help` | 列出命令。 |
+
+在任何命令后添加`--json`以获取JSON格式而不是文本，用于脚本：
+
+```
+$ NuggetVPN status --json
+{"status":"connected","profile_id":"p-de","profile":"Frankfurt 1","since":1790000000000}
+```
+
+## 退出代码 [#exit-codes]
+
+| 代码 | |
+| --- | --- |
+| 0 | 完成。 |
+| 1 | 应用程序拒绝：没有这样的服务器，未连接进行速度测试，等等。原因已打印。 |
+| 2 | 应用程序未运行。 |
+
+## 程序所在位置 [#where-the-program-is]
+
+| 系统 | |
+| --- | --- |
+| Windows | `C:\Program Files\Rigby Foundation\NuggetVPN\NuggetVPN.exe`，或你安装它的地方 |
+| macOS | `/Applications/NuggetVPN.app/Contents/MacOS/NuggetVPN` |
+| Linux | 从 .deb 或 .rpm 安装的 `/usr/bin/NuggetVPN`，或 AppImage 本身 |
+
+在 macOS 上，一个别名让它更简单：
+
+```bash
+alias nuggetvpn=/Applications/NuggetVPN.app/Contents/MacOS/NuggetVPN
+```
+
+### Windows [#windows]
+
+NuggetVPN 是一个窗口程序，而 Windows 不会等待这些程序完成。在 `cmd` 中，提示符会在输出出现之前返回。在 PowerShell，通过管道输出使其等待：
+
+```powershell
+& "C:\Program Files\Rigby Foundation\NuggetVPN\NuggetVPN.exe" status | Write-Output
+```
+
+读取输出或退出代码的脚本，或重定向输出的脚本，照常工作。
+
+## 安全 [#security]
+
+运行的应用程序在您自己的用户文件夹中监听一个套接字，每条命令都携带来自只有您的账户可以读取的文件的令牌。其他账户无法使用它。

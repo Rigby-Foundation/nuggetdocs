@@ -1,0 +1,93 @@
+---
+title: "从源码构建"
+description: "设置 Wails，构建嵌入式核心，并打包客户端。"
+---
+
+NuggetVPN 使用 Go、Wails v3 和 React 19。每个代理运行时都作为 Go 库链接到应用中。
+
+## 先决条件 [#prerequisites]
+
+- Go 1.26 或更新版本。
+- Bun 或 Node.js 用于前端。
+- Wails CLI v3.0.0。保持 CLI、Go 模块和 `@wailsio/runtime` 的一致。
+- 以下列出了平台构建工具。
+
+```bash
+go install github.com/wailsapp/wails/v3/cmd/wails3@v3.0.0
+```
+
+| 平台 | 构建工具 |
+| --- | --- |
+| macOS | Xcode 命令行工具: `xcode-select --install`. |
+| Linux | C 工具链, `libgtk-4-dev`, 和 `libwebkitgtk-6.0-dev`. `pkexec` 在运行时需要. |
+| Windows | 对于安装程序打包，WebView2 和 NSIS. |
+
+## 克隆并运行 [#clone-and-run]
+
+```bash
+git clone https://github.com/Rigby-Foundation/NuggetVPN.git
+cd NuggetVPN
+make dev
+```
+
+## 构建并验证 [#build-and-validate]
+
+```bash
+make build
+make test
+make vet
+```
+
+`make build` 写入 `bin/`. 对于独立前端检查:
+
+```bash
+cd frontend
+bun run build
+```
+
+## 需要构建标签 [#build-tags-are-required]
+
+使用仓库的 Make 和 Wails 任务. `Taskfile.yml` 定义 `SING_BOX_TAGS`, 而 `buildtags.go` 使缺失的必需标签成为编译错误.
+
+| 标签 | 功能 |
+| --- | --- |
+| `with_utls` | Reality. |
+| `with_quic` | Hysteria、Hysteria2 和 TUIC。 |
+| `with_wireguard` | WireGuard。 |
+| `with_clash_api` | 正在处理的流量计费；未打开 HTTP 控制器。 |
+| `with_gvisor` | 用于手动配置请求的传统 gVisor 堆栈。 |
+
+对于手动 Go 构建，从 Make 获取标签：
+
+```bash
+go build -tags "$(make -s tags)" .
+```
+
+## 桌面软件包 [#desktop-packages]
+
+| 命令 | 输出 |
+| --- | --- |
+| `make dmg` | `bin/NuggetVPN.dmg` |
+| `make dmg-universal` | 通用 arm64 + amd64 DMG。 |
+| `make linux-packages` | DEB、RPM 和 AppImage 在 `bin/` 中。 |
+| `make package` 在 Windows 上 | 可执行文件和 NSIS 安装程序。 |
+
+## Android 构建 [#android-builds]
+
+为 NDK 设置 `ANDROID_NDK_HOME`。APK 构建还需要 JDK 17 和通过 `ANDROID_HOME` 的 Android SDK。
+
+```bash
+wails3 task android:apk
+wails3 task android:package
+wails3 task android:run:device
+```
+
+这些命令分别构建调试版 arm64 APK、发布版 arm64 和 x86_64 APK，以及在连接的设备上进行调试构建。发布签名通过发布工作流的 `ANDROID_KEYSTORE_*` 密钥进行配置。
+
+## 贡献更改 [#contributing-changes]
+
+前端调用通过 `frontend/src/lib/backend.ts` 访问 `internal/app/` 下的导出方法。在添加后端方法时，在桥接命令表中添加一条条目；`bridge_test.go` 会检查双方是否一致。
+
+对生成配置的更改，扩展 `internal/sbconfig/build_test.go`。这些测试通过真实的核心选项解析器传入配置，并构建 Reality 出站。也要检查更改的协议是否与真实服务器一致。
+
+客户端的许可遵循 [GPL-3.0](https://github.com/Rigby-Foundation/NuggetVPN/blob/main/LICENSE)。请参阅仓库的 [贡献指南](https://github.com/Rigby-Foundation/NuggetVPN/blob/main/CONTRIBUTING.md)。

@@ -1,0 +1,137 @@
+---
+title: "Довідник API"
+description: "Методи плагіна, дозволи, типи результатів та події."
+---
+
+Сторінки викликають методи через `nugget.call(method, params)` і слухають події через `nugget.on(event, handler)`; див. [написання сторінок](/uk/docs/plugins/pages).
+
+Якщо плагін не має потрібного дозволу, виклик методу завершується помилкою із зазначенням відсутнього дозволу. Виклики методів вимкненого плагіна також відхиляються.
+
+## Методи [#methods]
+
+### Додаток [#app]
+
+| Метод | Дозвіл | Параметри | Повертає |
+| --- | --- | --- | --- |
+| `app.info` | — | | `{ version, language, platform, plugin: { id, version, permissions } }` |
+| `app.theme` | — | | Тема, яку застосовує SDK; див. [нижче](#apptheme). |
+| `ui.toast` | — | `{ text, kind? }` | `null`. Показує коротке повідомлення з префіксом у вигляді назви плагіна. `kind` може бути `"info"` (за замовчуванням), `"success"` або `"error"`. Максимум одне повідомлення кожні 1,5 секунди. |
+| `storage.get` | — | `{ key }` | Збережене значення JSON, або `null`. |
+| `storage.set` | — | `{ key, value }` | `null`. `value` може бути будь-яким значенням JSON; `null` видаляє ключ. Ключі до 200 символів, а сукупний розмір до 1 МБ. |
+| `notify` | `notifications` | `{ title, body }` | `null`. Системне повідомлення під назвою "Назва плагіна: заголовок". Не більше одного разу на кожні 10 секунд. Користувач може вимкнути повідомлення. |
+
+### Підключення [#connection]
+
+| Метод | Дозвіл | Параметри | Повертає |
+| --- | --- | --- | --- |
+| `vpn.status` | `state` | | Об’єкт [стану](#state). |
+| `vpn.traffic` | `state` | | [Зразок даних про трафік](#traffic). |
+| `vpn.connect` | `control` | `{ server? }` | Об’єкт [стану](#state). Підключає до сервера з ідентифікатором із `servers.list` або до вибраного в застосунку. Promise виконується після підключення й відхиляється, якщо жоден сервер не запрацював. |
+| `vpn.disconnect` | `control` | | `null` |
+| `connections.list` | `connections` | | Відкриті підключення; див. [нижче](#connection). |
+
+### Сервери та маршрутизація [#servers-and-routing]
+
+| Метод | Дозвіл | Параметри | Повертає |
+| --- | --- | --- | --- |
+| `servers.list` | `profiles` | | `[{ id, name, protocol, host, favorite, subscription }]`. `subscription` — це домен підписки, або `null`. Ніколи посилання, які містять облікові дані. |
+| `servers.add` | `import` | `{ link, name? }` | `null`. Додає сервер із спільного посилання (`vless://`, `ss://`, …). |
+| `subscriptions.add` | `import` | `{ url }` | `null`. Додає та отримує підписку. |
+| `routing.addRule` | `routing` | `{ kind, values, action, invert? }` | `null`. Додає правило в кінець маршрутизації користувача, з приміткою, що ваш плагін його додав, і застосовує його. |
+
+`routing.addRule`:
+
+| Параметр | |
+| --- | --- |
+| `kind` | `apps` (назви програм), `domains`, `ip` (адреси та діапазони CIDR), `domain_regex`, `port` (номери та діапазони, як `8000-8080`), `protocol` (`bittorrent`, `quic`, …), `geosite`, `geoip` (коди країн, як `ru`), `network` (`tcp`, `udp`), `ruleset` (URL-адреси списків правил). |
+| `values` | Значення для зіставлення, до 5000. |
+| `action` | `proxy` (через VPN), `direct` або `block`. |
+| `invert` | Співпадає з усім, чого значення не охоплюють. |
+
+## Події [#events]
+
+| Подія | Дозвіл | Дані |
+| --- | --- | --- |
+| `vpn.state` | `state` | Об’єкт [стану](#state): надсилається під час підписки, а потім після кожної зміни. |
+| `vpn.traffic` | `state` | [Дані про трафік](#traffic), раз на секунду під час підключення. |
+| `app.theme` | — | [Тема](#apptheme) після кожної її зміни користувачем. SDK застосовує її автоматично. |
+
+## Типи [#types]
+
+### Стан [#state]
+
+```json
+{
+  "status": "connected",
+  "server": "Frankfurt 1",
+  "server_id": "p-de",
+  "since": 1790000000000,
+  "reconnecting": false,
+  "blocked": false,
+  "error": null
+}
+```
+
+| Поле | |
+| --- | --- |
+| `status` | `idle`, `connecting`, `connected` або `error`. |
+| `server`, `server_id` | Сервер, під час підключення або коли підключено. |
+| `since` | Коли тунель піднявся, у мілісекундах Unix. |
+| `reconnecting` | Тунель впав і відновлюється. |
+| `blocked` | Перемикач аварійного завершення блокує весь трафік. |
+| `error` | Що пішло не так, коли `status` є `error`. |
+
+### Трафік [#traffic]
+
+```json
+{ "up": 12000000, "down": 340000000, "up_rate": 42000, "down_rate": 1830000, "total_up": 0, "total_down": 0 }
+```
+
+`up` і `down` — це байти за цю сесію; швидкості — байти за секунду.
+
+### Підключення [#connection-1]
+
+```json
+{
+  "id": "…",
+  "network": "tcp",
+  "protocol": "tls",
+  "host": "www.example.com",
+  "destination": "93.184.216.34:443",
+  "app": "chrome.exe",
+  "rule": "rule-1",
+  "route": "proxy",
+  "server": "p-de",
+  "upload": 1200,
+  "download": 48000,
+  "started": 1790000000000
+}
+```
+
+`rule` — це ідентифікатор правила маршрутизації, яке спрацювало, `"__default"` для всього іншого, або `""` для з’єднань, які застосунок маршрутизує самостійно.
+
+### app.theme [#apptheme]
+
+```json
+{
+  "mode": "dark",
+  "colors": { "background": "oklch(…)", "foreground": "…", "primary": "…" },
+  "radius": "0.625rem",
+  "font": "…",
+  "language": "en",
+  "dir": "ltr"
+}
+```
+
+## Низькорівневий протокол [#low-level-protocol]
+
+SDK обгортає `postMessage`. Вам це не потрібно, якщо ви не пишете власний SDK:
+
+- **Сторінка до застосунку:**
+  - `{ nugget: 1, id, method, params }`: виклик;
+  - `{ nugget: 1, subscribe: "event" }`: прослуховування події;
+  - `{ nugget: 1, hello: true }`: сторінка завантажена;
+  - `{ nugget: 1, height }`: висота панелі.
+- **Застосунок до сторінки:**
+  - `{ nugget: 1, id, result }` або `{ nugget: 1, id, error }`: відповідь;
+  - `{ nugget: 1, event, data }`: подія.

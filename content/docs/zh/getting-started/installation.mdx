@@ -1,0 +1,66 @@
+---
+title: "安装 NuggetVPN"
+description: "选择桌面安装程序，下载发行版，并启动应用程序。"
+---
+
+从[官方网站GitHub发布](https://github.com/Rigby-Foundation/NuggetVPN/releases)下载构建。使用适合您操作系统和处理器的软件包。
+
+## 桌面安装 [#desktop-installation]
+
+<Tabs items={['Windows', 'macOS', 'Linux']}>
+<Tab value="Windows">
+从 Releases 下载 NSIS 安装程序并运行它。Windows 使用 WebView2 来显示应用程序。
+
+要进行自动安装，请在 PowerShell 中运行此命令：
+
+```powershell
+irm https://raw.githubusercontent.com/Rigby-Foundation/NuggetVPN/main/scripts/install.ps1 | iex
+```
+
+该脚本会下载最新版本，检查 GitHub 发布的 SHA-256 摘要，安装它并启动应用程序。再次运行将更新安装。
+
+对于无人值守安装，请使用以 `-silent-installer.exe` 结尾的发行资产，或者将 `/S` 传递给常规安装程序。
+</Tab>
+<Tab value="macOS">
+从 Releases 下载 `.dmg` 并将 **NuggetVPN** 移动到 **应用程序** 。根据你的 Mac 选择 Apple silicon 或 Intel 架构，或者如果提供通用版本，也可以选择通用版本。
+
+你也可以使用安装脚本：
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/Rigby-Foundation/NuggetVPN/main/scripts/install.sh | sh
+```
+
+该脚本在安装并启动之前会下载并检查版本。再次运行会更新应用程序。
+
+如果 macOS 显示应用程序已损坏，请参见 [Gatekeeper 故障排除](/zh/docs/troubleshooting#macos-says-the-app-is-damaged)。
+</Tab>
+<Tab value="Linux">
+从版本中选择一个 `.deb`、`.rpm` 或 `.AppImage`。该应用在运行时需要 GTK 4 和 WebKitGTK 6，以及 polkit 的 `pkexec` 以提升桌面权限。
+
+当 apt、dnf 或 zypper 可用时，安装脚本会选择 `.deb` 或 `.rpm`；否则选择 AppImage：
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/Rigby-Foundation/NuggetVPN/main/scripts/install.sh | sh
+```
+
+它会检查发布摘要，安装应用，并启动它。再次运行时会更新你的安装。
+
+对于手动下载的 AppImage，在打开之前请先将其设为可执行：
+
+```bash
+chmod +x ./NuggetVPN*.AppImage
+```
+</Tab>
+</Tabs>
+
+## 首次启动 [#first-launch]
+
+以正常用户身份打开应用程序。在桌面端，每次应用会话中的第一次连接会提示管理员权限以创建 TUN 网络接口。图形界面继续以你的用户身份运行；隧道在一个独立的特权服务中运行。
+
+该应用需要服务器配置。继续进行 [你的第一次连接](/zh/docs/getting-started/first-connection)。
+
+## 更新 [#updates]
+
+桌面版本可以在应用内检查并安装更新。你也可以重新运行安装脚本或手动安装新版本。在将安装移至另一台机器之前，请保存一个 [备份](/zh/docs/guides/backups)。
+
+对于 Android APK 和未签名的 iOS IPA，请遵循 [移动端指南](/zh/docs/getting-started/mobile)。

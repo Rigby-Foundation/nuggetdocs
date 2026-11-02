@@ -1,0 +1,66 @@
+---
+title: "Install NuggetVPN"
+description: "Choose a desktop installer, download a release, and launch the app."
+---
+
+Download builds from the [official GitHub releases](https://github.com/Rigby-Foundation/NuggetVPN/releases). Use a package for your operating system and processor.
+
+## Desktop installation
+
+<Tabs items={['Windows', 'macOS', 'Linux']}>
+<Tab value="Windows">
+Download the NSIS installer from Releases and run it. Windows uses WebView2 to display the app.
+
+For an automated install, run this in PowerShell:
+
+```powershell
+irm https://raw.githubusercontent.com/Rigby-Foundation/NuggetVPN/main/scripts/install.ps1 | iex
+```
+
+The script downloads the latest release, checks the SHA-256 digest published by GitHub, installs it, and starts the app. Running it again updates the installation.
+
+For unattended installation, use the release asset ending in `-silent-installer.exe`, or pass `/S` to the regular installer.
+</Tab>
+<Tab value="macOS">
+Download the `.dmg` from Releases and move **NuggetVPN** to **Applications**. Choose Apple silicon or Intel for your Mac, or a universal build if provided.
+
+You can also use the installer script:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/Rigby-Foundation/NuggetVPN/main/scripts/install.sh | sh
+```
+
+The script downloads and checks the release before installing and starting it. Running it again updates the app.
+
+If macOS says the app is damaged, see [Gatekeeper troubleshooting](/en/docs/troubleshooting#macos-says-the-app-is-damaged).
+</Tab>
+<Tab value="Linux">
+Choose a `.deb`, `.rpm`, or `.AppImage` from Releases. The app needs GTK 4 and WebKitGTK 6 at runtime, plus polkit’s `pkexec` for desktop elevation.
+
+The installer script chooses a `.deb` or `.rpm` when apt, dnf, or zypper is available, and an AppImage otherwise:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/Rigby-Foundation/NuggetVPN/main/scripts/install.sh | sh
+```
+
+It checks the release digest, installs the app, and starts it. Running it again updates your installation.
+
+For a manually downloaded AppImage, make it executable before opening it:
+
+```bash
+chmod +x ./NuggetVPN*.AppImage
+```
+</Tab>
+</Tabs>
+
+## First launch
+
+Open the app as your normal user. On desktop, the first connection in each app session prompts for administrator access to create the TUN network interface. The graphical interface continues to run as your user; the tunnel runs in a separate privileged service.
+
+The app needs a server configuration. Continue with [your first connection](/en/docs/getting-started/first-connection).
+
+## Updates
+
+Desktop builds can check for and install updates inside the app. You can also rerun an installer script or install a newer release manually. Save a [backup](/en/docs/guides/backups) before moving an installation to another machine.
+
+For Android APKs and the unsigned iOS IPA, follow the [mobile guide](/en/docs/getting-started/mobile).

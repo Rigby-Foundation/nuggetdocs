@@ -1,0 +1,98 @@
+---
+title: "编写插件页面"
+description: "使用 JavaScript SDK、主题变量、事件和存储。"
+---
+
+一个插件可以有两个页面，均为纯 HTML：
+
+- 一个 **面板** ，显示在 设置 → 插件 下的插件下方；
+- 一个 **后台页面** 页面，在插件开启时保持隐形运行。使用它来响应事件，比如连接中断时的通知。
+
+## 这个 SDK [#the-sdk]
+
+包含 SDK，并使用全局 `nugget`：
+
+```html
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="/plugins/_sdk/nugget.js"></script>
+</head>
+<body>
+  <p id="status">…</p>
+  <script>
+    const show = (state) => {
+      document.getElementById("status").textContent = state.status;
+    };
+    nugget.call("vpn.status").then(show);
+    nugget.on("vpn.state", show);
+  </script>
+</body>
+</html>
+```
+
+| | |
+| --- | --- |
+| `nugget.call(method, params?)` | 调用应用方法。返回其结果的承诺，或因 `Error` 拒绝，其消息说明出错原因。 |
+| `nugget.on(event, handler)` | 监听事件。返回一个停止监听的函数。 |
+| `nugget.fit()` | 请求应用将面板大小调整为其内容大小。SDK 已经会在页面大小变化时执行此操作。 |
+
+每个方法和事件都在 [API参考](/zh/docs/plugins/api) 中。
+
+## 看起来像应用 [#looking-like-the-app]
+
+SDK 使用用户的主题装饰页面，并保持其最新状态：
+
+- **颜色：** 设置为 `<html>` 上的 CSS 变量：
+  - `--background`, `--foreground`, `--card`, `--card-foreground`;
+  - `--primary`, `--primary-foreground`, `--secondary`, `--muted`,
+ `--muted-foreground`, `--accent`;
+  - `--border`, `--input`, `--ring`, `--destructive`;
+  - `--status-connected`, `--status-connecting`, `--status-error`,
+ `--status-idle`.
+- **形状：** `--radius`，应用的圆角。
+- **属性：** `color-scheme`, `data-theme="light|dark"`, `lang` 和
+ `dir` （波斯语为从右到左）。
+
+保持页面背景透明，它就像应用的一部分一样显示：
+
+```css
+html { background: transparent; color: var(--foreground); font: 13px/1.4 system-ui, sans-serif; }
+button { background: var(--primary); color: var(--primary-foreground); border: 0; border-radius: var(--radius); }
+.muted { color: var(--muted-foreground); }
+```
+
+应用自身的字体在页面内不可用；请使用系统字体堆栈，或在插件中引入字体。
+
+## 大小 [#size]
+
+面板的宽度与插件卡片相同，并根据内容调整大小，高度在 60 到 4000 像素之间。避免 `height: 100vh` 布局：框架的高度取决于其中的内容。
+
+## 存储内容 [#storing-things]
+
+每个插件都有自己的存储空间，最多可存储 1 MB 的 JSON 文件，跨重启和更新保持不变，并在插件被移除时删除：
+
+```js
+const count = (await nugget.call("storage.get", { key: "count" })) ?? 0;
+await nugget.call("storage.set", { key: "count", value: count + 1 });
+```
+
+沙盒中 `localStorage` 和 cookies 不起作用。
+
+## 不起作用的内容 [#what-doesnt-work]
+
+页面在沙盒中运行；参见 [权限和沙盒](/zh/docs/plugins/security)。简言之：
+
+- 不支持表单（使用 JavaScript 和 `nugget.call`）；
+- 不支持弹出窗口、`alert` 或新窗口；
+- 不支持嵌套框架；
+- 不支持 `eval` 或 `new Function`；
+- 网络访问仅限于 `network` 中的主机；
+- 除了你自己的插件外，不要使用任何来自其他地方的脚本、样式或图片。
+
+链接到你插件的文件可以使用绝对路径、`/plugins/<your id>/file.png`，也可以使用相对路径。
+
+## 调试 [#debugging]
+
+在开发版本中（`make dev`），按住 Shift 并右键点击页面，然后选择“检查”以打开开发者工具，然后在控制台的上下文选择器中选择你插件的框架。`console.log` 的输出将显示在那里。

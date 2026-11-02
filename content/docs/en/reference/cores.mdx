@@ -1,0 +1,34 @@
+---
+title: "Core compatibility"
+description: "Choose the embedded engine that fits your servers and routing."
+icon: "Cpu"
+---
+
+Choose a core under **Settings → Core**. Desktop builds embed four cores in the same binary, so there is no separate core executable to install. The app shows the embedded version next to each choice.
+
+Start with **Built-in sing-box** for the broadest support for the app’s features.
+
+## Compare cores
+
+| Core | Use it for | Limits |
+| --- | --- | --- |
+| **Built-in sing-box** | The default TodayCore-based engine, including XHTTP, Reality, and the app’s complete routing feature set. | `rigby://` is not supported by the embedded cores. |
+| **Official sing-box** | SagerNet’s sing-box implementation. | No XHTTP; those servers need built-in or Xray. |
+| **mihomo** | Clash Meta and complete Clash configurations. | Skips detected-protocol rules and sing-box `.srs` / `.json` rule lists. Uses its own geo data. App TLS fragmentation and SNI settings do not apply. |
+| **Xray** | Xray server handling with the built-in tunnel, DNS, and routing. | No Hysteria, Hysteria2, TUIC, SSH, or Shadowsocks plugins. App TLS fragmentation and SNI settings do not apply. |
+
+## Android
+
+Only the built-in core and Xray are offered on Android. The built-in core integrates with Android’s VpnService, and Xray works behind it.
+
+## Unsupported profiles
+
+The app asks the selected core which profiles it cannot run. Those profiles are marked with the reason instead of appearing to be usable and failing without explanation.
+
+If a server is marked **Needs another core**, compare its protocol and transport with this table, switch the core, and try again.
+
+## How Xray fits in
+
+Xray handles outbound server connections while the built-in core maintains TUN, DNS, routing, and the kill switch. A password-protected loopback entry point sends Xray’s own transport directly out, avoiding routing it back into itself.
+
+For implementation details, see [architecture](/en/docs/developers/architecture). For supported link and transport families, see [protocols](/en/docs/reference/protocols).

@@ -1,0 +1,69 @@
+---
+title: "Route your traffic"
+description: "Choose which apps and websites use the VPN, go direct, or get blocked."
+---
+
+Open **Routing** to build rules as a graph or edit them in the rules view. Rules match connections and send them to a destination.
+
+## Destinations
+
+| Destination | Behaviour |
+| --- | --- |
+| **Through the VPN** | Uses the connected VPN server. |
+| **Direct** | Bypasses the tunnel and uses your own connection. |
+| **Block** | Refuses the connection. |
+| **Drop** | Discards the connection without an answer. |
+| **Specific server** | Sends matching traffic through another configured server. |
+
+<Callout type="warn" title="Direct traffic bypasses the VPN">
+Use **Direct** only for traffic you want on your own connection. Check **Everything else** too: it determines the route for traffic that matches no rule.
+</Callout>
+
+## Make a rule
+
+1. Open the **Add** controls in **Routing** and choose a traffic source, such as **Applications** or **Domains**.
+2. Add the app, domain, address, or other values to match.
+3. In graph view, drag from the source’s right edge to the destination you want.
+4. Open **Order** and put the rule where it should be checked.
+5. Confirm the destination of **Everything else**.
+
+A source with no entries matches nothing. The graph also supports notes, and undo and redo are available while editing.
+
+## What you can match
+
+| Source | Matches |
+| --- | --- |
+| **Applications** | Process names on desktop, or apps on Android. |
+| **Domains** | Sites and subdomains. |
+| **IP / Networks** | IP addresses and CIDR blocks. |
+| **Domain pattern** | Domain regular expressions. |
+| **Ports** | A single port or range. |
+| **Traffic protocols** | Detected traffic such as HTTP, DNS, or TLS. |
+| **Transport** | TCP or UDP. |
+| **Service / Country** | GeoSite or GeoIP categories and rule sets. |
+| **Rule list** | Sites or addresses from a downloadable list. |
+| **Combined** | Several conditions joined with AND or OR, with optional NOT. |
+
+## First match wins
+
+Rules are checked from the top. The first matching rule decides the route. An app rule above a domain rule can therefore decide the route before the domain rule is considered.
+
+For example, to send most traffic through the VPN but a particular app directly:
+
+1. Add an **Applications** rule for that app and connect it to **Direct**.
+2. Keep it above broader rules that might also match the app.
+3. Connect **Everything else** to **Through the VPN**.
+
+Use **Network connections** to inspect which rule caught a request. The rule hit indicator counts matching connections that are open now.
+
+## A particular server or DNS resolver
+
+Add **Specific server** to send a rule through another exit. If that server is later deleted, the rule falls back to the connected server.
+
+A domain rule can also choose its own resolver. See [DNS](/en/docs/guides/dns) before assigning one.
+
+## Core compatibility
+
+The built-in core supports the complete routing editor. Xray handles server traffic while the built-in core retains routing. With mihomo, detected-protocol rules and sing-box-format rule lists are skipped, and its own geo data is used. See [core differences](/en/docs/reference/cores).
+
+For presets, GeoIP/GeoSite data, sharing, and schedules, continue with [routing setups](/en/docs/guides/routing-setups).

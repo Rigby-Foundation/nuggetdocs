@@ -1,0 +1,76 @@
+---
+title: "plugin.json リファレンス"
+description: "すべてのマニフェストフィールド、ファイル制約、パッケージ制限。"
+---
+
+すべてのプラグインにはzipのルートに`plugin.json`があります。
+
+```json
+{
+  "format": 1,
+  "id": "com.example.weather",
+  "name": "Server weather",
+  "version": "1.0.0",
+  "author": "You",
+  "description": "What it does, in a sentence or two.",
+  "homepage": "https://example.com/weather",
+  "icon": "icon.png",
+
+  "themes": [ … ],
+  "fonts": [ … ],
+  "routing": [ … ],
+
+  "panel": { "title": "Weather", "file": "panel.html" },
+  "background": "background.html",
+
+  "permissions": ["state", "profiles", "notifications"],
+  "network": ["status.example.com"]
+}
+```
+
+## プラグインについて [#about-the-plugin]
+
+| フィールド | 必須 | |
+| --- | --- | --- |
+| `format` | はい | 常に`1`。新しいアプリは新しいフォーマットを読み取る場合がありますが、このアプリは他のフォーマットを拒否し、その旨を表示します。 |
+| `id` | はい | プラグインの永久ID。3〜64文字の小文字、数字、`.`、`-`、`_`を使用し、文字または数字で始まり、終わる必要があります。逆ドメイン形式が適しています：`com.example.weather`。アップデート時も同じIDを保持する必要があります。 |
+| `name` | はい | 最大60文字。 |
+| `version` | はい | 文字、数字、`.`、`+`、`-`で構成される任意のバージョン文字列、最大32文字。ユーザーに表示されます；アプリはバージョンを比較しません。 |
+| `author` | | 最大80文字。 |
+| `description` | | 最大500文字。インストールプロンプトとプラグインリストに表示されます。 |
+| `homepage` | | `https://`のアドレス。表示はされますが、アプリで開かれることはありません。 |
+| `icon` | | プラグイン内のPNG、JPEG、WebP、またはSVGファイル。36〜40ピクセルで正方形に表示されます。 |
+
+## 内容 [#content]
+
+| フィールド | |
+| --- | --- |
+| `themes` | カスタムテーマ。[content](/ja/docs/plugins/content#themes)を参照してください。 |
+| `fonts` | フォントファイル。[content](/ja/docs/plugins/content#fonts)を参照してください。 |
+| `routing` | `.vflow`ルーティング設定。[content](/ja/docs/plugins/content#routing-setups)を参照してください。 |
+
+## ページ [#pages]
+
+| フィールド | |
+| --- | --- |
+| `panel` | `{ "title": "…", "file": "panel.html" }`: 設定 → プラグイン内のプラグインの下に表示されるページ。`title`は最大40文字で、デフォルトはプラグイン名です。 |
+| `background` | `"background.html"`: プラグインがオンの間、ページが実行され続ける。 |
+
+[ページの作成](/ja/docs/plugins/pages)を参照。
+
+## アクセス [#access]
+
+| フィールド | |
+| --- | --- |
+| `permissions` | プラグインのページが行う可能性のあること。[権限](/ja/docs/plugins/security#permissions)を参照してください。使用するものだけを要求してください。インストール時のプロンプトには全ての権限が表示されます。 |
+| `network` | あなたのページが接続する可能性のあるホスト名。`https`および`wss`を介して、`api.example.com`や`*.example.com`のような場所にアクセス可能。その他の接続は不可能です。IPアドレス、`localhost`およびローカル名（`.local`、`.lan`、`.internal`、`.home.arpa`）は拒否されます。ページを持つプラグインのみが許可されます。 |
+
+## ファイル [#files]
+
+ファイル名は、文字、数字、`.`、`-`、`_`を使用でき、フォルダーは`/`で区切られます。名前はドットで始めることはできません。マニフェストに名前が記載されているすべてのファイルは、プラグイン内にあり、適切な種類の拡張子を持っている必要があります。
+
+プラグインのサイズは最大50 MB、ファイル数は最大500で、各ファイルのサイズは最大25 MB、展開後の合計サイズは80 MBまでです。
+
+ファイルは拡張子によって決定されるタイプで提供されます。それ以外のものは提供されません。
+
+`.html`、`.js`、`.mjs`、`.css`、`.json`、`.svg`、`.png`、`.jpg`、`.jpeg`、`.webp`、`.gif`、`.ttf`、`.otf`、`.woff`、`.woff2`、`.txt`

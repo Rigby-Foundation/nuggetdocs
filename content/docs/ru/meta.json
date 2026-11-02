@@ -1,0 +1,14 @@
+{
+  "title": "Документация",
+  "pages": [
+    "index",
+    "getting-started",
+    "---Использование NuggetVPN---",
+    "guides",
+    "reference",
+    "troubleshooting",
+    "---Разработка с Nugget---",
+    "plugins",
+    "developers"
+  ]
+}

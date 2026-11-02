@@ -1,0 +1,11 @@
+{
+  "title": "リファレンス",
+  "pages": [
+    "cores",
+    "protocols",
+    "cli",
+    "privacy",
+    "files"
+  ],
+  "icon": "Library"
+}

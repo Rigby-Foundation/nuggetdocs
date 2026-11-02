@@ -1,0 +1,41 @@
+---
+title: "فایل‌ها و پوشه‌ها"
+description: "داده‌های برنامه، گزارش‌ها، تنظیمات زمان اجرا، و داده‌های هسته را روی دسکتاپ پیدا کنید."
+---
+
+NuggetVPN از شناسهٔ برنامه `org.rigbyfoundation.nuggetvpn` برای داده‌های کاربری خود استفاده می‌کند. مکان‌ها بسته به سیستم‌عامل متفاوت هستند.
+
+## macOS [#macos]
+
+| داده‌ها | مکان |
+| --- | --- |
+| پروفایل‌ها و تنظیمات | `~/Library/Application Support/org.rigbyfoundation.nuggetvpn` |
+| گزارش‌ها | `~/Library/Logs/org.rigbyfoundation.nuggetvpn` |
+| پیکربندی اصلی تولید شده | `~/Library/Caches/org.rigbyfoundation.nuggetvpn/` |
+| داده‌های اصلی فقط برای مدیر | `/Library/Application Support/NuggetVPN/cores` |
+
+## Linux [#linux]
+
+| داده‌ها | مکان |
+| --- | --- |
+| پروفایل‌ها و تنظیمات | `$XDG_DATA_HOME/org.rigbyfoundation.nuggetvpn` |
+| گزارش‌ها | `$XDG_DATA_HOME/org.rigbyfoundation.nuggetvpn/logs` |
+| پیکربندی اصلی تولید شده | `$XDG_CACHE_HOME/org.rigbyfoundation.nuggetvpn` |
+| داده‌های اصلی فقط برای مدیر | `/var/lib/nuggetvpn/cores` |
+
+وقتی متغیرهای XDG تنظیم نشده‌اند، مقادیر پیش‌فرض معمولی کاربر `~/.local/share` برای داده‌ها و `~/.cache` برای کش هستند.
+
+## Windows [#windows]
+
+| داده‌ها | مکان |
+| --- | --- |
+| پروفایل‌ها و تنظیمات | `%APPDATA%\org.rigbyfoundation.nuggetvpn` |
+| گزارش‌ها | `%LOCALAPPDATA%\org.rigbyfoundation.nuggetvpn\logs` |
+| پیکربندی اصلی تولید شده | `%LOCALAPPDATA%\org.rigbyfoundation.nuggetvpn\runtime` |
+| داده‌های اصلی فقط برای مدیر | `%ProgramData%\NuggetVPN\cores` |
+
+## جابجایی یا بررسی داده‌ها [#moving-or-inspecting-data]
+
+استفاده از [پشتیبان‌گیری و بازیابی](/fa/docs/guides/backups) را به جای کپی دستی فایل‌های جداگانه ترجیح دهید. پیکربندی اصلی تولید شده می‌تواند شامل اطلاعات حساب باشد؛ آن را بدون بررسی، همراه با گزارش باگ منتشر نکنید.
+
+برای مسیر اجرایی که دستورات ترمینال از آن استفاده می‌کنند، به [مرجع CLI](/fa/docs/reference/cli#where-the-program-is) مراجعه کنید.

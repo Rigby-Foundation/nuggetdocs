@@ -1,0 +1,70 @@
+---
+title: "プラグイン SDK"
+description: "テーマ、フォント、ルーティング設定、サンドボックス化されたページを作成します。"
+---
+
+<Callout title="Android の制限">
+Android ではプラグインページは動作しません。テーマ、フォント、ルーティング設定は利用できます。
+</Callout>
+
+プラグインは単一の`.nuggetplugin`ファイルです：ルートに`plugin.json`を含むzipファイルです。次を提供できます：
+
+| | 表示場所 |
+| --- | --- |
+| **テーマ** | 設定 → 外観 → テーマ、’プラグインから’の下 |
+| **フォント** | 設定 → 外観 のフォントリスト |
+| **ルーティング設定** | ルーティング → プラグインから |
+| **ページ** | プラグイン内の設定 → プラグイン |
+| **バックグラウンドページ** | どこにも表示されません: プラグインがオンの間、裏で実行されます |
+
+テーマ、フォント、ルーティング設定のみを持つプラグインは、コードをまったく実行しません。ページはプレーンなHTMLとJavaScriptです。サンドボックス内で実行され、アプリには小さなメッセージAPIを通じて到達します。そして、それもインストール時にユーザーが許可した範囲に限られます。
+
+## クイックスタート [#quick-start]
+
+最も速い開始方法は、[`examples/plugins/glance`](https://github.com/Rigby-Foundation/NuggetVPN/tree/main/examples/plugins/glance)の例です。ステータスカードには接続ボタン、テーマ、一般的なトラッカーをブロックするルーティング設定があります：
+
+```
+glance/
+├── plugin.json
+├── icon.svg
+├── panel.html
+└── routing/
+    └── trackers.vflow
+```
+
+それをコピーし、`plugin.json`の`id`を自分のものに変更し、ビルドします:
+
+```bash
+go run ./cmd/nuggetplugin path/to/your-plugin
+```
+
+これはフォルダの隣に `your-plugin.nuggetplugin` と書きます。アプリがインストール時に行う方法でプラグインをチェックするので、誤りがあればここに最初に表示されます。その後、 **設定 → プラグイン → プラグインをインストール…** の下でインストールしてください。
+
+テーマだけを追加する最小限のプラグイン:
+
+```json
+{
+  "format": 1,
+  "id": "com.example.dusk",
+  "name": "Dusk",
+  "version": "1.0.0",
+  "themes": [
+    {
+      "id": "dusk",
+      "name": "Dusk",
+      "mode": "dark",
+      "background": { "h": 280, "c": 0.03, "l": 0.16 },
+      "accent": { "h": 30, "c": 0.15 }
+    }
+  ]
+}
+```
+
+## 次に進む場所 [#where-to-go-next]
+
+- [plugin.json リファレンス](/ja/docs/plugins/manifest): すべてのフィールド。
+- [テーマ、フォント、ルーティング設定](/ja/docs/plugins/content): コンテンツプラグイン。
+- [ページの作成](/ja/docs/plugins/pages): SDK、スタイリング、サイズ設定、ストレージ。
+- [API リファレンス](/ja/docs/plugins/api): すべてのメソッドとイベント。
+- [権限とサンドボックス](/ja/docs/plugins/security): プラグインができること、できないこと、そしてその理由。
+- [パッケージ化と公開](/ja/docs/plugins/publishing): ビルド、バージョン、アップデート。

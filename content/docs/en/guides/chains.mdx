@@ -1,0 +1,26 @@
+---
+title: "Proxy chains"
+description: "Pass through intermediate profiles before reaching your exit server."
+---
+
+A proxy chain sends traffic through each configured hop in order before the selected exit. Each hop dials through the previous one.
+
+```text
+Your device → First hop → Second hop → Selected exit → Destination
+```
+
+## Build a chain
+
+1. Add the profiles you need under **Profiles & subscriptions**.
+2. Select the profile that should be the final exit.
+3. Open **Settings → Proxy chain** and enable **Chain through other profiles**.
+4. Add the intermediate profiles in order. The first hop is closest to you; the last hop comes immediately before the exit.
+5. Connect and check the active connection.
+
+Use the move-up and move-down controls to reorder hops. Remove a hop to leave it out of the chain. The selected exit and profiles already in the chain are excluded from the add-hop picker.
+
+## Diagnose a chain
+
+Every hop must be reachable and supported by the chosen core. If the connection fails, first test the exit on its own, then add one intermediate hop at a time.
+
+More hops introduce more connections and potential failure points. Use the [speed test and logs](/en/docs/guides/monitoring) to compare behaviour, and check [core support](/en/docs/reference/cores) for every protocol involved.

@@ -1,0 +1,13 @@
+{
+  "title": "SDK плагінів",
+  "pages": [
+    "index",
+    "manifest",
+    "content",
+    "pages",
+    "api",
+    "security",
+    "publishing"
+  ],
+  "icon": "Puzzle"
+}

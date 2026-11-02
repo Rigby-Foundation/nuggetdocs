@@ -1,0 +1,14 @@
+{
+  "title": "文档",
+  "pages": [
+    "index",
+    "getting-started",
+    "---使用 NuggetVPN---",
+    "guides",
+    "reference",
+    "troubleshooting",
+    "---使用 Nugget 开发---",
+    "plugins",
+    "developers"
+  ]
+}

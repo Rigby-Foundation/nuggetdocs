@@ -1,0 +1,61 @@
+---
+title: "アーキテクチャ"
+description: "ユーザーインターフェース、特権サービス、組み込みコアがどのように連携しているか。"
+---
+
+## 1つのバイナリ、2つのデスクトップモード [#one-binary-two-desktop-modes]
+
+```text
+NuggetVPN                  GUI, running as the user
+NuggetVPN --core-service   Privileged tunnel service
+```
+
+GUIはプラットフォームの認可フローを通じてもう1つの自身のコピーを起動します：`osascript` は macOS 上で、`pkexec` は Linux 上で、または Windows 上で UAC。したがって、両方の側は同じアプリバージョンを使用します。
+
+```text
+React + Wails UI  ←→  Authenticated socket  ←→  Core service
+    user                  JSON lines              admin
+                                              TUN, DNS, routing
+                                              embedded engines
+```
+
+特権サービスはコアライブラリをプロセス内で呼び出します。ログ、接続状態、バイトカウンター、およびライブ接続リストは同じソケットを通じて返されます。GUIを終了するとサービスも終了します。また、サービスはGUIプロセスを監視するため、クラッシュが発生してもサービスがルーティングテーブルを保持したままになりません。
+
+## ソケット認証 [#socket-authentication]
+
+すべてのサービス接続は、まずセッションごとの256ビットトークンを提示する必要があります。GUIはそれを`0600`ファイルに書き込み、昇格済みプロセスはそのファイルを読み取り削除します。認証されていない接続は状態を公開することなく閉じられます。
+
+ファイルを介してトークンを渡すことで、トークンがLinux上で世界中から読み取り可能なコマンドラインに公開されることを避けます。明示的な認証は、Unixソケットのchmodやchownが想定されるアクセス境界を強制しないプラットフォームもカバーします。
+
+## 組み込みエンジン [#embedded-engines]
+
+組み込みのTodayCoreフォークは、sing-boxのモジュールパスをGo`replace`ディレクティブを使用して保持します。公式のsing-boxとsing-tunは、両方の実装が共存できるように、`third_party/`内の別々のモジュールパスにベンダー化されています。
+
+mihomoは完全なClash構成を処理します。Xrayは、組み込みコアの背後で接続のサーバ側を実行し、TUN、DNS、およびルーティングを保持します。保護されたループバックエントリポイントは、自己ルーティングを避けるためにXrayのトランスポートを直接外部に運びます。
+
+コアのHTTPコントローラーは起動されません。トラフィック会計と接続の検査はプロセス内で読み取られ、インポートされたClash構成からのコントローラーオプションは削除されます。
+
+## ソースマップ [#source-map]
+
+| パス | 責任 |
+| --- | --- |
+| `main.go` | エントリーポイント、GUI/サービスディスパッチ、ウィンドウ、およびトレイ。 |
+| `internal/app/` | フロントエンドに公開されるサービス。 |
+| `internal/core/` | 特権サービス、IPCクライアント、およびプロセス内ランタイム。 |
+| `internal/sbconfig/` | プロファイルと設定からsing-box構成への変換; ルーティングコンパイル。 |
+| `internal/cores/` | mihomoおよびXray構成の変換。 |
+| `internal/link/` | 共有リンク、sing-box JSON、およびClash YAMLパース。 |
+| `internal/remote/` | サブスクリプションおよび任意プロファイルの同期。 |
+| `internal/probe/` | レイテンシーおよび接続確認。 |
+| `internal/stats/`、`internal/speedtest/` | 保存された測定値および速度テスト。 |
+| `internal/plugins/` | プラグインのパッケージ化、検証、提供、およびサンドボックスポリシー。 |
+| `internal/cli/` | デスクトップのコマンドラインおよび制御ソケット。 |
+| `internal/storage/`, `internal/models/` | 永続性および共有型。 |
+| `frontend/` | React アプリ、バックエンドブリッジ、および翻訳。 |
+| `Taskfile.yml`, `build/` | ビルドおよびパッケージングタスク。 |
+
+## Android 境界 [#android-boundary]
+
+Android の VpnService は特権を持つデスクトッププロセスではなくトンネルを供給する。`internal/android` は sing-box にインターフェースを渡し、コアソケットを VPN の外に保持し、現在のネットワークを報告する。小さな Java ホストが Go 共有ライブラリを WebView アプリにロードする。
+
+プロジェクトを実行するには[ビルディング](/ja/docs/developers/building)を参照し、拡張の境界については[プラグインセキュリティ](/ja/docs/plugins/security)を参照してください。

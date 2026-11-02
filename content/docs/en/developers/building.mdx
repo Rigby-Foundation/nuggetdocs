@@ -1,0 +1,93 @@
+---
+title: "Build from source"
+description: "Set up Wails, build the embedded cores, and package the client."
+---
+
+NuggetVPN uses Go, Wails v3, and React 19. Every proxy runtime is linked into the app as a Go library.
+
+## Prerequisites
+
+- Go 1.26 or newer.
+- Bun or Node.js for the frontend.
+- Wails CLI v3.0.0. Keep the CLI, Go module, and `@wailsio/runtime` aligned.
+- Platform build tools listed below.
+
+```bash
+go install github.com/wailsapp/wails/v3/cmd/wails3@v3.0.0
+```
+
+| Platform | Build tools |
+| --- | --- |
+| macOS | Xcode Command Line Tools: `xcode-select --install`. |
+| Linux | C toolchain, `libgtk-4-dev`, and `libwebkitgtk-6.0-dev`. `pkexec` is needed at runtime. |
+| Windows | WebView2 and NSIS for installer packaging. |
+
+## Clone and run
+
+```bash
+git clone https://github.com/Rigby-Foundation/NuggetVPN.git
+cd NuggetVPN
+make dev
+```
+
+## Build and validate
+
+```bash
+make build
+make test
+make vet
+```
+
+`make build` writes to `bin/`. For a standalone frontend check:
+
+```bash
+cd frontend
+bun run build
+```
+
+## Build tags are required
+
+Use the repository’s Make and Wails tasks. `Taskfile.yml` defines `SING_BOX_TAGS`, and `buildtags.go` makes missing required tags a compile error.
+
+| Tag | Feature |
+| --- | --- |
+| `with_utls` | Reality. |
+| `with_quic` | Hysteria, Hysteria2, and TUIC. |
+| `with_wireguard` | WireGuard. |
+| `with_clash_api` | In-process traffic accounting; no HTTP controller is opened. |
+| `with_gvisor` | The legacy gVisor stack for hand-written configurations that request it. |
+
+For a manual Go build, obtain the tags from Make:
+
+```bash
+go build -tags "$(make -s tags)" .
+```
+
+## Desktop packages
+
+| Command | Output |
+| --- | --- |
+| `make dmg` | `bin/NuggetVPN.dmg` |
+| `make dmg-universal` | Universal arm64 + amd64 DMG. |
+| `make linux-packages` | DEB, RPM, and AppImage in `bin/`. |
+| `make package` on Windows | Executable and NSIS installer. |
+
+## Android builds
+
+Set `ANDROID_NDK_HOME` for the NDK. APK builds also need JDK 17 and the Android SDK through `ANDROID_HOME`.
+
+```bash
+wails3 task android:apk
+wails3 task android:package
+wails3 task android:run:device
+```
+
+These build a debug arm64 APK, release arm64 and x86_64 APKs, and a debug build on a connected device respectively. Release signing is configured through the release workflow’s `ANDROID_KEYSTORE_*` secrets.
+
+## Contributing changes
+
+Frontend calls go through `frontend/src/lib/backend.ts` to exported methods under `internal/app/`. Add an entry to the bridge command table when adding a backend method; `bridge_test.go` checks the two sides agree.
+
+For changes to generated configurations, extend `internal/sbconfig/build_test.go`. Those tests feed configuration through the real core option parser and construct the Reality outbound. Check changed protocols against a real server too.
+
+The client is licensed under [GPL-3.0](https://github.com/Rigby-Foundation/NuggetVPN/blob/main/LICENSE). See the repository’s [contribution guide](https://github.com/Rigby-Foundation/NuggetVPN/blob/main/CONTRIBUTING.md).

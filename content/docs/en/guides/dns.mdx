@@ -1,0 +1,35 @@
+---
+title: "DNS and packet size"
+description: "Configure name resolution and adjust MTU when transfers stall."
+---
+
+## Default DNS
+
+**Settings → Connection → DNS server** controls where names are resolved while connected. The app accepts a resolver address such as `1.1.1.1`.
+
+Keep your provider’s requirements in mind when changing the resolver. If a server connects but websites do not load, DNS is one of the settings to check.
+
+## DNS for a rule
+
+Domain rules in **Routing** can choose their own DNS resolver. The rule’s DNS field accepts:
+
+| Value | Resolver |
+| --- | --- |
+| `1.1.1.1` | A plain DNS server address. |
+| `tls://dns.example.com` | DNS over TLS. Replace the example hostname with your resolver. |
+| `https://dns.example.com/dns-query` | DNS over HTTPS. Use the resolver’s actual endpoint. |
+| `local` | Local name resolution. |
+
+This controls resolution for the matching domains. The rule’s destination separately determines how the resulting connection is routed.
+
+## MTU
+
+**Settings → Connection → MTU** sets the largest packet carried by the tunnel. The app’s guidance uses 9000 for most links and suggests lowering it when large transfers stall.
+
+When diagnosing a problem, change one setting at a time and compare the same request or transfer. Keep a note of the previous value so you can restore it.
+
+## TLS and obfuscation
+
+**Settings → TLS and obfuscation** includes TLS fragmentation, mixed SNI case, record padding, and SNI spoofing. These affect handshakes and should be chosen for a known server or network requirement.
+
+The app’s TLS fragmentation and SNI settings do not apply to mihomo or Xray. Use the built-in core or official sing-box for those controls. See [core compatibility](/en/docs/reference/cores).

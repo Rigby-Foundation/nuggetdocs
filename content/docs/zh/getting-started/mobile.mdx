@@ -1,0 +1,41 @@
+---
+title: "Android 和 iOS"
+description: "安装移动端版本并了解其与桌面版的不同之处。"
+---
+
+## Android [#android]
+
+从[Releases](https://github.com/Rigby-Foundation/NuggetVPN/releases)下载适用于您设备的APK。Android可能会要求您允许从用于打开APK的应用安装。
+
+1. 安装并打开NuggetVPN。
+2. 使用[快速开始](/zh/docs/getting-started/first-connection)添加订阅或服务器。
+3. 连接并批准Android的VPN权限提示。
+
+Android的 **VpnService** 提供隧道。该应用在应用内运行核心，而不是启动桌面管理员服务。
+
+### 在Android上可用 [#available-on-android]
+
+- 内置核心和Xray。
+- 订阅和服务器导入，包括二维码扫描。
+- 路由、主题、字体以及来自插件的路由内容。
+- Material You墙纸颜色适用于 **跟随系统主题** 主题，在Android12及更高版本上使用。
+
+### 桌面功能在 Android 上不可用 [#desktop-features-not-available-on-android]
+
+官方 sing-box 和 mihomo 不可用。Wi-Fi 规则、开机启动、全局快捷键、系统托盘、命令行以及应用内更新也不可用。请安装较新的 APK 进行更新。
+
+插件页面无法在 Android 上运行。WebView 的原生桥无法与这些框架隔离，因此仅启用内容贡献。
+
+## iOS [#ios]
+
+NuggetVPN 不通过 App Store 分发。发布版本提供一个以 `-ios-unsigned.ipa` 结尾的未签名资源，适用于 iOS 15 及更新版本。
+
+<Callout type="warn" title="需要 VPN 权限">
+使用签名应用或支持的安装方法（例如 TrollStore）用您自己的证书对 IPA 进行签名。签名证书必须允许 Network Extensions 和数据包隧道。免费的 Apple ID 证书不提供这些功能：应用可以安装，但无法连接。
+</Callout>
+
+安装正确签名的版本后，导入您的提供商配置，并在连接时接受系统 VPN 提示。遵循您已安装的 iOS 版本的功能；仅限桌面的控制和 Android 功能列表不应假定适用于 iOS。
+
+## 移动您的配置 [#moving-your-configuration]
+
+提供商订阅可以在每台设备上导入。将其 URL 视为凭证。有关备份和还原行为，请参见 [backups](/zh/docs/guides/backups)。

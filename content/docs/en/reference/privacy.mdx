@@ -1,0 +1,37 @@
+---
+title: "Privacy and local control"
+description: "Understand what runs locally, what plugins can access, and what is recorded."
+---
+
+## The app and its cores
+
+All proxy cores are compiled into the application as Go libraries. No core executable is fetched or launched at runtime. On desktop, the user interface runs as your account and starts a privileged copy of the same binary to create and manage the tunnel.
+
+The core service authenticates socket connections with a per-session token. The GUI creates the token in a restricted file, and the elevated service reads and deletes it.
+
+## No core HTTP controller
+
+Counters and live connection lists are read in-process. The cores do not expose an HTTP controller. Controller settings requested by a Clash configuration are removed before mihomo runs it.
+
+The desktop CLI uses a separate authenticated local control socket for your account. See [CLI security](/en/docs/reference/cli#security).
+
+## Records and diagnostics
+
+- Traffic statistics are stored on your computer.
+- Release builds start with logging off.
+- Enabling logging records app and core diagnostics on screen and in a file.
+- Turning logging off also deletes the saved log.
+
+Review **Settings → Privacy** for the current controls, and [monitoring](/en/docs/guides/monitoring) for diagnostic steps.
+
+## External requests
+
+Subscriptions are fetched from the URLs you add. Automatic subscription refresh, server measurements, speed tests, rule-list downloads, synchronisation, and update checks make network requests when used. Providers receive requests needed to serve their subscriptions and connections.
+
+This page describes client behaviour; it does not establish a logging or privacy policy for your VPN provider.
+
+## Plugins
+
+Plugins request permissions at installation. Content-only themes, fonts, and routing setups run no code. Plugin pages run in a sandbox and can only call permitted app methods or contact declared network hosts.
+
+Plugin server-list access does not include credential-bearing share links. Plugins cannot read files, settings, or logs, execute native code, or run in the privileged service. See [plugin permissions](/en/docs/plugins/security) for the full contract.

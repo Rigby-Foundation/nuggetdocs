@@ -1,0 +1,41 @@
+---
+title: "Файлы и папки"
+description: "Найдите данные приложения, логи, конфигурацию во время работы и данные ядра на рабочем столе."
+---
+
+NuggetVPN использует идентификатор приложения `org.rigbyfoundation.nuggetvpn` для пользовательских данных. Местоположения зависят от операционной системы.
+
+## macOS [#macos]
+
+| Данные | Местоположение |
+| --- | --- |
+| Профили и настройки | `~/Library/Application Support/org.rigbyfoundation.nuggetvpn` |
+| Логи | `~/Library/Logs/org.rigbyfoundation.nuggetvpn` |
+| Сгенерированная основная конфигурация | `~/Library/Caches/org.rigbyfoundation.nuggetvpn/` |
+| Основные данные только для администратора | `/Library/Application Support/NuggetVPN/cores` |
+
+## Linux [#linux]
+
+| Данные | Местоположение |
+| --- | --- |
+| Профили и настройки | `$XDG_DATA_HOME/org.rigbyfoundation.nuggetvpn` |
+| Логи | `$XDG_DATA_HOME/org.rigbyfoundation.nuggetvpn/logs` |
+| Сгенерированная основная конфигурация | `$XDG_CACHE_HOME/org.rigbyfoundation.nuggetvpn` |
+| Основные данные только для администратора | `/var/lib/nuggetvpn/cores` |
+
+Когда переменные XDG не установлены, обычные пользовательские значения по умолчанию — `~/.local/share` для данных и `~/.cache` для кэша.
+
+## Windows [#windows]
+
+| Данные | Местоположение |
+| --- | --- |
+| Профили и настройки | `%APPDATA%\org.rigbyfoundation.nuggetvpn` |
+| Логи | `%LOCALAPPDATA%\org.rigbyfoundation.nuggetvpn\logs` |
+| Сгенерированная основная конфигурация | `%LOCALAPPDATA%\org.rigbyfoundation.nuggetvpn\runtime` |
+| Основные данные только для администратора | `%ProgramData%\NuggetVPN\cores` |
+
+## Перемещение или просмотр данных [#moving-or-inspecting-data]
+
+Предпочитайте [резервное копирование и восстановление](/ru/docs/guides/backups) вместо ручного копирования отдельных файлов. Сгенерированная основная конфигурация может содержать учетные данные; не публикуйте её вместе с отчетом об ошибке без предварительного просмотра.
+
+Для пути к исполняемому файлу, используемому в командах терминала, смотрите [Справочник CLI](/ru/docs/reference/cli#where-the-program-is).

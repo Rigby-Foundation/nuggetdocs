@@ -1,0 +1,71 @@
+---
+title: "插件 SDK"
+description: "创建主题、字体、路由设置和沙盒页面。"
+---
+
+<Callout title="Android 限制">
+插件页面无法在 Android 上运行。主题、字体和路由方案仍受支持。
+</Callout>
+
+一个插件是一个单独的 `.nuggetplugin` 文件：一个根目录下含有 `plugin.json` 的 zip 文件。它可以提供：
+
+| | 它出现的位置 |
+| --- | --- |
+| **主题** | 设置 → 外观 → 主题，在“来自插件”下 |
+| **字体** | 设置 → 外观 中的字体列表 |
+| **路由方案** | 路由 → 来自插件 |
+| **页面** | 在插件下，进入设置 → 插件 |
+| **后台页面** | 无固定位置：插件开启时，它在后台运行，用户看不到 |
+
+只有主题、字体和路由设置的插件根本不会运行任何代码。页面是普通的 HTML 和 JavaScript。它们在沙箱中运行，并通过API向应用发送小消息，而且只会执行用户在安装时允许的操作。
+
+## 快速开始 [#quick-start]
+
+最快捷的开始方法是例子中的
+[`examples/plugins/glance`](https://github.com/Rigby-Foundation/NuggetVPN/tree/main/examples/plugins/glance)。它有一个带连接按钮的状态卡、一个主题，以及一个阻止常见追踪器的路由设置：
+
+```
+glance/
+├── plugin.json
+├── icon.svg
+├── panel.html
+└── routing/
+    └── trackers.vflow
+```
+
+复制它，将`id`中`plugin.json`的内容改为你自己的，然后构建它：
+
+```bash
+go run ./cmd/nuggetplugin path/to/your-plugin
+```
+
+这会在文件夹旁边写上 `your-plugin.nuggetplugin`。它以应用程序安装时的方式检查插件，因此任何错误会先在这里显示。然后在 **设置 → 插件 → 安装插件…** 下安装它。
+
+一个只添加主题的最小插件：
+
+```json
+{
+  "format": 1,
+  "id": "com.example.dusk",
+  "name": "Dusk",
+  "version": "1.0.0",
+  "themes": [
+    {
+      "id": "dusk",
+      "name": "Dusk",
+      "mode": "dark",
+      "background": { "h": 280, "c": 0.03, "l": 0.16 },
+      "accent": { "h": 30, "c": 0.15 }
+    }
+  ]
+}
+```
+
+## 接下来去哪里 [#where-to-go-next]
+
+- [plugin.json 参考](/zh/docs/plugins/manifest)：每个字段。
+- [主题、字体和路由设置](/zh/docs/plugins/content)：内容插件。
+- [写页面](/zh/docs/plugins/pages)：SDK、样式、尺寸、存储。
+- [API 参考](/zh/docs/plugins/api)：每个方法和事件。
+- [权限和沙盒](/zh/docs/plugins/security)：插件可以做和不能做的事情，以及原因。
+- [打包和发布](/zh/docs/plugins/publishing)：构建、版本和更新。

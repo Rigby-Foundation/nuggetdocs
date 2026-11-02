@@ -1,0 +1,51 @@
+---
+title: "打包与发布"
+description: "验证、构建、版本管理并分享一个 .nuggetplugin 文件。"
+---
+
+## 构建 [#building]
+
+```bash
+go run ./cmd/nuggetplugin path/to/your-plugin
+go run ./cmd/nuggetplugin path/to/your-plugin out/your-plugin.nuggetplugin
+```
+
+第一个会在文件夹旁边写入 `your-plugin.nuggetplugin`；第二个会命名输出。不管哪种方式，它都会像安装插件一样检查插件，并打印它所要求的内容：
+
+```
+Glance 1.0.0: examples/plugins/glance.nuggetplugin (3 KB)
+asks for: state, control
+```
+
+A `.nuggetplugin` 是一个普通的压缩包，所以任何压缩工具都可以使用，只要 `plugin.json` 位于根目录而不是文件夹内。`nuggetplugin` 仍然是确保安装的方式。
+
+## 版本和更新 [#versions-and-updates]
+
+使用与已安装插件相同的 `id` 安装插件会更新它：
+
+- 它的文件将被替换；
+- 它的存储会保留；
+- 如果新版本请求旧版本没有的权限，安装提示会标记这些权限，用户需要再次允许。
+
+应用不会比较版本，所以安装旧版本也可以。每个发行版都要更改 `version`，这样用户就可以分辨他们拥有哪一个。
+
+永远不要更改 `id`：具有新 ID 的插件是一个不同的插件，原有的存储将不会有。
+
+## 分享 [#sharing]
+
+将 `.nuggetplugin` 文件放在可以让人下载的地方：一个 GitHub 版本，你的网站，一个聊天工具。插件是通过文件安装的，应用程序本身从不自动下载它们。
+
+在你的插件描述或主页上，说明：
+- 它的功能；
+- 为什么它需要每个请求的权限；
+- 它联系哪些主机，以及向那里发送什么。
+
+## 清单 [#checklist]
+
+- [ ] `id` 是你的并且是永久的。
+- [ ] `version` 已提升。
+- [ ] 仅使用你需要的权限。
+- [ ] `network` 只列出你联系的主机。
+- [ ] 页面在浅色和深色主题中，以及在从右到左的语言中，显示正常。
+- [ ] 字体和图片是你可以重新分发的。
+- [ ] `go run ./cmd/nuggetplugin` 通过了。

@@ -1,0 +1,32 @@
+---
+title: "Choose a server"
+description: "Use manual selection, automatic selection, favourites, and health checks."
+---
+
+Choose a connection source first, then open **Servers** to see its servers. The list supports search, sorting, favourites, and selecting several entries.
+
+## Manual selection
+
+Pick a server to use it as the selected exit. While connected, check **Home** for the actual active server.
+
+Under **Settings → Behaviour**, **Try other servers if one fails** allows the app to move to another server in the subscription when the chosen one cannot start. Turn it off when a failed connection should stop with an error instead of falling back.
+
+## Automatic selection
+
+Automatic mode chooses among servers in the selected source. Background health checks help avoid repeatedly failing candidates.
+
+Enable **Settings → Behaviour → Switch to the fastest server** to keep measuring the best few servers and move to the fastest. These checks use a small amount of data every few minutes.
+
+<Callout title="A latency result is a recommendation">
+A server with a good ping is a candidate, not confirmation of an active tunnel. The connected state and actual server name come from the running core.
+</Callout>
+
+## When a server needs another core
+
+An unsupported server is marked with the reason supplied by the selected core. Switch under **Settings → Core**, using the [compatibility table](/en/docs/reference/cores) to choose.
+
+For example, official sing-box does not handle XHTTP; use the built-in core or Xray for those servers. The `rigby://` protocol is not implemented by the embedded cores.
+
+## A single configuration with no server list
+
+Some full configurations appear as one profile. They do not expose a separately selectable collection of servers in **Servers**. Use the configuration as supplied, or ask your provider for a subscription with individual server links.
